@@ -38,13 +38,12 @@ export default function App() {
       name: 'Bahor', 
       bgGradient: 'from-emerald-100 via-pink-100 to-teal-100', 
       accentColor: 'text-emerald-950', 
-      particles: ['🌸', '💧', '🌸', '💧', '🌸', '🌸']
+      particles: ['🌸', '💧']
     },
     summer: { 
       name: 'Yoz', 
       bgGradient: 'from-yellow-100 via-amber-100 to-orange-200', 
-      accentColor: 'text-amber-950', 
-      particles: ['☀️', '🍃', '☀️', '🍃']
+      accentColor: 'text-amber-950'      
     }
   };
 
@@ -186,8 +185,8 @@ export default function App() {
             <h3 className="text-xl font-bold mb-4 text-white">Zarbdor IM</h3>
             <div className="space-y-2 text-gray-300 text-sm md:text-base leading-relaxed">
               <p><span className="font-semibold text-white">Manzil:</span> Jizzax viloyati, Zarbdor tumani</p>
-              <p><span className="font-semibold text-white">Tel:</span> +998 (95) 633-78-78</p>
-              <p><span className="font-semibold text-white">Email:</span> sherzod3191178@gmail.com</p>
+              <p><span className="font-semibold text-white">Tel:</span> +998 (72) 123-45-67</p>
+              <p><span className="font-semibold text-white">Email:</span> info@zarbdorim.uz</p>
             </div>
           </div>
 
