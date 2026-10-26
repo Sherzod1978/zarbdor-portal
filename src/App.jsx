@@ -43,7 +43,8 @@ export default function App() {
     summer: { 
       name: 'Yoz', 
       bgGradient: 'from-yellow-100 via-amber-100 to-orange-200', 
-      accentColor: 'text-amber-950'      
+      accentColor: 'text-amber-950',
+      particles: ['', '']      
     }
   };
 
