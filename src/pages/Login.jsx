@@ -1,74 +1,88 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function Login({ currentSeason }) {
+export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Oddiy tekshiruv (maktab tomonidan berilgan login/parol)
-    if (username === 'school2026' && password === 'zarbdor123') {
-      localStorage.setItem('isLoggedIn', 'true');
-      navigate('/collaboration');
-    } else {
-      setError('Login yoki parol xato! Maktab bergan maʼlumotlarni kiriting.');
+    setError('');
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/token/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // JWT tokenlarni saqlab qo'shamiz
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
+        
+        // Muvaffaqiyatli kirgach, hamkorlik sahifasiga yo'naltiramiz
+        navigate('/collaboration');
+      } else {
+        setError('Login yoki parol xato kiritildi!');
+      }
+    } catch (err) {
+      setError('Server bilan ulanishda xatolik yuz berdi!');
     }
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-200">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-slate-900 border border-orange-500/30 p-8 rounded-2xl shadow-2xl">
         <div className="text-center mb-8">
-          <span className="text-4xl">🔐</span>
-          <h2 className="text-2xl font-black text-gray-900 mt-2">Tizimga Kirish</h2>
-          <p className="text-sm text-gray-600 mt-1">O'qituvchi va o'quvchilar hamkorligi bo'limi</p>
+          <h2 className="text-3xl font-bold text-orange-500">Zarbdor IM</h2>
+          <p className="text-gray-400 text-sm mt-2">O'qituvchilar va o'quvchilar hamkorligi</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-xl text-sm text-center">
+          <div className="mb-4 p-3 bg-red-500/20 border border-red-500 text-red-400 text-sm rounded-lg text-center font-medium">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Maktab ID / Login</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Foydalanuvchi nomi (Login)</label>
             <input
               type="text"
-              required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Masalan: school2026"
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none transition"
+              className="w-full px-4 py-3 bg-slate-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-orange-500 transition"
+              placeholder="Loginni kiriting"
+              required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Maxfiy Parol</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Parol</label>
             <input
               type="password"
-              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 bg-slate-800 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-orange-500 transition"
               placeholder="••••••••"
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:outline-none transition"
+              required
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg shadow-orange-500/30 transition duration-300"
+            className="w-full py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition shadow-lg shadow-orange-600/30"
           >
-            Kirish
+            Tizimga kirish
           </button>
         </form>
-
-        <div className="mt-6 text-center text-xs text-gray-500">
-          Namuna uchun login: <span className="font-bold">school2026</span> | Parol: <span className="font-bold">zarbdor123</span>
-        </div>
       </div>
     </div>
   );
