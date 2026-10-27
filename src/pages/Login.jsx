@@ -11,7 +11,7 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await fetch('https://zarbdor-portal.onrender.com', {
+      const response = await fetch('https://zarbdor-portal.onrender.com/api/token/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
