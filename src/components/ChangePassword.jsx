@@ -11,7 +11,7 @@ export default function ChangePassword() {
     const token = localStorage.getItem('access_token');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/change-password/', {
+      const response = await fetch('https://zarbdor-portal.onrender.com/api/change-password/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
