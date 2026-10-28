@@ -27,7 +27,7 @@ export default function About() {
       bgGradient: 'from-slate-100 via-sky-100 to-blue-200', 
       heroBg: 'from-sky-600 to-blue-800',
       accentColor: 'text-sky-950', 
-      particles: ['❄', '❅', '❆', '❄', '❅']
+      particles: ['❄', '❅', '❅']
     },
     spring: { 
       name: 'Bahor', 
@@ -52,26 +52,32 @@ export default function About() {
       name: "Feruz Qarabayev", 
       role: "Maktab Direktori", 
       image: "/direktor.png",
-      desc: "Maktab faoliyatini boshqarish va ta'lim sifatini nazorat qilish bo'yicha yuqori tajribaga ega rahbar."
+      desc: "Maktab faoliyatini boşqariş va ta'lim sifatini nazorat qiliş böyiça yuqori tajribaga ega rahbar."
     },
     { 
-      name: "Shohjahon Amirov", 
-      role: "O'quv ishlari bo'yicha direktor o'rinbosari", 
+      name: "Şohjahon Amirov", 
+      role: "Öquv işlari böyiça direktor örinbosari", 
       image: "/Amirov.png",
-      desc: "O'quv jarayonini rejalashtirish va ilg'or pedagogik texnologiyalarni joriy etish."
+      desc: "Öquv jarayonini rejalaştiriş va ilğor pedagogik texnologiyalarni joriy etiş."
     },
     { 
       name: "Dilfuza Bekamova", 
-      role: "Ma'naviy va ma'rifiy ishlar bo'yicha direktor o'rinbosari", 
+      role: "Ma'naviy va ma'rifiy işlar böyiça direktor örinbosari", 
       image: "/Dilfuza.jpg",
-      desc: "O'quvchilar o'rtasida ma'naviy-axloqiy muhitni shakllantirish va loyihalarni boshqarish."
-    }
+      desc: "Öquvçilar örtasida ma'naviy-axloqiy muhitni şakllantiriş va loyihalarni boşqariş."
+    },
+    { 
+  name: "Iroda Nişonova", 
+  role: "Maktab Psixologi", 
+  image: "/Iroda.jpg", // если файла нет, оставьте bo'sh: ""
+  desc: "Öquvçilar bilan psixologik treninglar va maslahatlar ötkaziş."
+}
   ];
 
   const features = [
-    { title: "Zamonaviy IT Laboratoriya", desc: "So'nggi rusumdagi kompyuterlar, 3D printerlar va robototexnika to'plamlari.", icon: "💻" },
-    { title: "Shinam va Shaffof Sinflar", desc: "Interaktiv doskalar hamda qulay ergonomik mebellar bilan jihozlangan.", icon: "🏫" },
-    { title: "Sport va Salomatlik", desc: "Yopiq va ochiq sport maydonchalari, gimnastika va futbol to'garaklari.", icon: "⚽" },
+    { title: "Zamonaviy IT Laboratoriya", desc: "Sönggi rusumdagi kompyuterlar, 3D printerlar va robototexnika töplamlari.", icon: "💻" },
+    { title: "Şinam va şaffof sinflar", desc: "Interaktiv doskalar hamda qulay ergonomik mebellar bilan jihozlangan.", icon: "🏫" },
+    { title: "Sport va Salomatlik", desc: "Yopiq va oçiq sport maydonçalari, voleybol va futbol tögaraklari.", icon: "⚽" },
     { title: "Boy Kutubxona va Media-markaz", desc: "Minglab ilmiy, badiiy va elektron kitoblar bazasi.", icon: "📚" }
   ];
 
