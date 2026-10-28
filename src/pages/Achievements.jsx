@@ -15,7 +15,7 @@ export default function Achievements() {
     {
       id: 2,
       studentName: 'Qarşıboyeva Mubına',
-      title: 'IELTS 7.5 Xalqaro Tillar Sertifikati',
+      title: 'IELTS 7.5 Xalqaro tillar sertifikati',
       category: 'Sertifikat',
       date: '2026-08-15',
       image: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80'
@@ -100,8 +100,8 @@ export default function Achievements() {
       {/* Sarlavha va Admin tugmasi */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-gray-200 mb-8 flex flex-wrap justify-between items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">🏆 O'quvchilarimiz Yutuqlari</h1>
-          <p className="text-gray-600">Maktabimiz o'quvchilarining olimpiadalarda va xalqaro sertifikatlarda erishgan natijalari.</p>
+          <h1 className="text-3xl font-black text-gray-900 mb-2">🏆 Öquvçilarimiz yutuqlari</h1>
+          <p className="text-gray-600">Maktabimiz öquvçilarining olimpiadalarda va xalqaro sertifikatlarda erishgan natijalari.</p>
         </div>
         
         {!isAdmin ? (
