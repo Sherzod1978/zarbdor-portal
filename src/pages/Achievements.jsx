@@ -9,15 +9,15 @@ export default function Achievements() {
       studentName: 'Mamatqulov Temur',
       title: 'Informatika fanidan Respublika Olimpiadasi 1-örin',
       category: 'Olimpiada',
-      date: '2026-05-10',
+      date: '2027-05-10',
       image: defaultPlaceholder
     },
     {
       id: 2,
       studentName: 'Qarşıboyeva Mubına',
-      title: 'IELTS 7.5 Xalqaro tillar sertifikati',
+      title: 'IELTS 9.0 Xalqaro tillar sertifikati',
       category: 'Sertifikat',
-      date: '2026-08-15',
+      date: '2027-08-15',
       image: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80'
     }
   ];
@@ -89,7 +89,7 @@ export default function Achievements() {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Haqiqatan ham ushbu sertifikatni o\'chirmoqchimisiz?')) {
+    if (window.confirm('Haqiqatan ham uşbu sertifikatni öçirmoqçimisiz?')) {
       setAchievements(achievements.filter(item => item.id !== id));
     }
   };
@@ -125,7 +125,7 @@ export default function Achievements() {
       {showAdminLogin && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-2xl max-w-sm w-full shadow-2xl">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin Tizimiga Kiriş</h3>
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin tizimiga kiriş</h3>
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <input
                 type="password"
