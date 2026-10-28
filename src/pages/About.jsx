@@ -115,10 +115,10 @@ export default function About() {
       <div className={`py-16 px-6 text-center text-white bg-gradient-to-r ${current.heroBg} shadow-lg relative z-10`}>
         <div className="max-w-5xl mx-auto">
           <Link to="/" className="inline-block mb-6 px-5 py-2 bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md text-sm font-semibold transition">
-            ← Bosh sahifaga qaytish
+            ← Boş sahifaga qaytiş
           </Link>
           <h1 className="text-4xl md:text-6xl font-black mb-4 text-white drop-shadow-md">
-            Maktabimiz Haqida ({current.name})
+            Maktabimiz Haqida
           </h1>
           <p className="text-xl md:text-2xl font-medium text-white/95 max-w-3xl mx-auto leading-relaxed">
             Zarbdor Ixtisoslashtirilgan Maktabi — iqtidorli yoshlarni kashf etuvchi va ularni kelajak yetakchilariga aylantiruvchi maskan.

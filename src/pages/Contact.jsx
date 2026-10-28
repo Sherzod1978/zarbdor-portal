@@ -13,7 +13,7 @@ export default function Contact({ currentSeason }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Murojaat yuborilganda ko'rsatiladigan bildirishnoma
+
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);
@@ -26,8 +26,8 @@ export default function Contact({ currentSeason }) {
       
       {/* Sarlavha */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-gray-200 mb-8">
-        <h1 className="text-3xl font-black text-gray-900 mb-2">📞 Admin bilan bog'lanish</h1>
-        <p className="text-gray-600">Maktab ma'muriyati yoki sayt admini bilan bog'lanish uchun murojaat qoldiring yoki ko'rsatilgan aloqa vositalaridan foydalaning.</p>
+        <h1 className="text-3xl font-black text-gray-900 mb-2">📞 Admin bilan boğlaniş</h1>
+        <p className="text-gray-600">Maktab ma'muriyati yoki sayt admini bilan boğlaniş uçun murojaat qoldiring yoki körsatilgan aloqa vositalaridan foydalaning.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -42,7 +42,7 @@ export default function Contact({ currentSeason }) {
             </div>
             <div>
               <h3 className="font-bold text-gray-900 text-lg">Telefon aloqasi</h3>
-              <p className="text-xs text-gray-500 mb-2">Dushanba - Shanba (08:00 - 17:00)</p>
+              <p className="text-xs text-gray-500 mb-2">Duşanba - Şanba (08:00 - 17:00)</p>
               <a href="tel:+998721234567" className="text-orange-600 font-bold hover:underline block text-sm">
                 +998 (94) 342-22-21
               </a>
@@ -58,8 +58,8 @@ export default function Contact({ currentSeason }) {
               ✉️
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 text-lg">Elektron pochta</h3>
-              <p className="text-xs text-gray-500 mb-2">Xatingizga 24 soat ichida javob beramiz</p>
+              <h3 className="font-bold text-gray-900 text-lg">Elektron poçta</h3>
+              <p className="text-xs text-gray-500 mb-2">Xatingizga 24 soat içida javob beramiz</p>
               <a href="mailto:info@zarbdorim.uz" className="text-blue-600 font-bold hover:underline block text-sm">
                 info@zarbdorim.uz
               </a>
@@ -92,12 +92,12 @@ export default function Contact({ currentSeason }) {
 
         {/* Murojaat Yuborish Formasi */}
         <div className="lg:col-span-2 bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-200">
-          <h2 className="text-2xl font-black text-gray-900 mb-2">✉️ Admin portaliga xabar yuborish</h2>
-          <p className="text-sm text-gray-600 mb-6">Savol, taklif yoki murojaatlaringizni quyidagi forma orqali yuborishingiz mumkin.</p>
+          <h2 className="text-2xl font-black text-gray-900 mb-2">✉️ Admin portaliga xabar yuboriş</h2>
+          <p className="text-sm text-gray-600 mb-6">Savol, taklif yoki murojaatlaringizni quyidagi forma orqali yuborişingiz mumkin.</p>
 
           {submitted && (
             <div className="mb-6 p-4 bg-emerald-100 border border-emerald-400 text-emerald-800 rounded-2xl text-sm font-bold flex items-center gap-2 animate-bounce">
-              <span>✅</span> Murojaatingiz muvaffaqiyatli yuborildi! Admin tez orada siz bilan bog'lanadi.
+              <span>✅</span> Murojaatingiz muvaffaqiyatli yuborildi! Admin tez orada siz bilan boğlanadi.
             </div>
           )}
 
@@ -108,7 +108,7 @@ export default function Contact({ currentSeason }) {
                 <input
                   type="text"
                   required
-                  placeholder="Masalan: Sherzod Amanov"
+                  placeholder="Masalan: Şerzod Amanov"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:bg-white focus:outline-none transition"
@@ -130,7 +130,7 @@ export default function Contact({ currentSeason }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Elektron pochtangiz (Email)</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Elektron poçtangiz (Email)</label>
                 <input
                   type="email"
                   placeholder="misol@gmail.com"
@@ -148,9 +148,9 @@ export default function Contact({ currentSeason }) {
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:bg-white focus:outline-none transition"
                 >
                   <option value="Taklif / Murojaat">Taklif / Murojaat</option>
-                  <option value="Qabul bo'yicha">Qabul bo'yicha savol</option>
+                  <option value="Qabul bo'yicha">Qabul böyiça savol</option>
                   <option value="Texnik muammo">Saytdagi texnik muammo</option>
-                  <option value="Boshqa">Boshqa</option>
+                  <option value="Boshqa">Boşqa</option>
                 </select>
               </div>
             </div>
@@ -171,7 +171,7 @@ export default function Contact({ currentSeason }) {
               type="submit"
               className="w-full py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg shadow-orange-500/30 transition duration-300"
             >
-              🚀 Murojaatni Yuborish
+              🚀 Murojaatni yuboriş
             </button>
           </form>
         </div>

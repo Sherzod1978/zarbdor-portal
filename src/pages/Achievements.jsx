@@ -6,15 +6,15 @@ export default function Achievements() {
   const initialAchievements = [
     {
       id: 1,
-      studentName: 'Ahmadov Jasur',
-      title: 'Informatika fanidan Respublika Olimpiadasi 1-o\'rin',
+      studentName: 'Mamatqulov Temur',
+      title: 'Informatika fanidan Respublika Olimpiadasi 1-örin',
       category: 'Olimpiada',
       date: '2026-05-10',
       image: defaultPlaceholder
     },
     {
       id: 2,
-      studentName: 'Karimova Zilola',
+      studentName: 'Qarşıboyeva Mubına',
       title: 'IELTS 7.5 Xalqaro Tillar Sertifikati',
       category: 'Sertifikat',
       date: '2026-08-15',
@@ -109,14 +109,14 @@ export default function Achievements() {
             onClick={() => setShowAdminLogin(true)}
             className="px-5 py-2.5 bg-gray-900 text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition"
           >
-            ⚙️ Admin Boshqaruvi
+            ⚙️ Admin Boşqaruvi
           </button>
         ) : (
           <button 
             onClick={() => setIsAdmin(false)}
             className="px-5 py-2.5 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 transition"
           >
-            🚪 Admin rejimidan chiqish
+            🚪 Admin rejimidan çiqiş
           </button>
         )}
       </div>
@@ -125,7 +125,7 @@ export default function Achievements() {
       {showAdminLogin && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-2xl max-w-sm w-full shadow-2xl">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin Tizimiga Kirish</h3>
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin Tizimiga Kiriş</h3>
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <input
                 type="password"
@@ -141,13 +141,13 @@ export default function Achievements() {
                   onClick={() => setShowAdminLogin(false)}
                   className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-xl text-xs"
                 >
-                  Bekor qilish
+                  Bekor qiliş
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-orange-600 text-white font-bold rounded-xl text-xs hover:bg-orange-700"
                 >
-                  Kirish
+                  Kiriş
                 </button>
               </div>
             </form>
@@ -159,12 +159,12 @@ export default function Achievements() {
       {isAdmin && (
         <div className="bg-orange-50 border-2 border-orange-200 p-6 rounded-3xl mb-10 shadow-lg">
           <h2 className="text-xl font-black text-orange-900 mb-4 flex items-center gap-2">
-            <span>➕</span> Yangi Yutuq/Sertifikat Qo'shish (Admin Panel)
+            <span>➕</span> Yangi Yutuq/Sertifikat Qöşiş (Admin Panel)
           </h2>
           <form onSubmit={handleAdd} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">O'quvchi F.I.Sh</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Öquvçi F.I.Ş</label>
                 <input
                   type="text"
                   placeholder="Masalan: Amanov Sherzod"
@@ -196,7 +196,7 @@ export default function Achievements() {
                 >
                   <option value="Olimpiada">Olimpiada</option>
                   <option value="Sertifikat">Fan Sertifikati (IELTS, CEFR, IT)</option>
-                  <option value="Sport">Sport / Boshqa</option>
+                  <option value="Sport">Sport / Boşqa</option>
                 </select>
               </div>
             </div>
@@ -216,7 +216,7 @@ export default function Achievements() {
               type="submit"
               className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md shadow-orange-500/30 transition mt-2"
             >
-              Sertifikatni Saytga Joylash
+              Sertifikatni Saytga Joylaş
             </button>
           </form>
         </div>
@@ -251,7 +251,7 @@ export default function Achievements() {
                   onClick={() => handleDelete(item.id)}
                   className="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition"
                 >
-                  🗑 O'chirish
+                  🗑 Öçiriş
                 </button>
               </div>
             )}

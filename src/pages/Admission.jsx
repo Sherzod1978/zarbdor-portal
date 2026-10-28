@@ -3,15 +3,15 @@ import { Link } from 'react-router-dom';
 
 export default function Admission({ currentSeason }) {
   const steps = [
-    { step: "1-Bosqich", title: "Onlayn ro'yxatdan o'tish", desc: "Maxsus portal orqali o'quvchining shaxsiy ma'lumotlari kiritiladi va ariza topshiriladi.", icon: "📝" },
-    { step: "2-Bosqich", title: "Saralash imtihonlari", desc: "Matematika, mantiqiy fikrlash va ingliz tili fanlaridan test sinovlari o'tkaziladi.", icon: "✍️" },
-    { step: "3-Bosqich", title: "Yakuniy natija va qabul", desc: "Imtihondan muvaffaqiyatli o'tgan nomzodlar maktabga o'qishga qabul qilinadi.", icon: "🎉" }
+    { step: "1-Bosqich", title: "Onlayn röyxatdan ötiş", desc: "Maxsus portal orqali öquvchining şaxsiy ma'lumotlari kiritiladi va ariza topşiriladi.", icon: "📝" },
+    { step: "2-Bosqich", title: "Saralaş imtihonlari", desc: "Matematika, mantiqiy fikrlaş va ingliz tili fanlaridan test sinovlari ötkaziladi.", icon: "✍️" },
+    { step: "3-Bosqich", title: "Yakuniy natija va qabul", desc: "Imtihondan muvaffaqiyatli ötgan nomzodlar maktabga öqişga qabul qilinadi.", icon: "🎉" }
   ];
 
   const documents = [
-    "O'quvchining tug'ilganlik haqida guvohnomasi (asli va nusxasi)",
+    "Öquvçining tuğilganlik haqida guvohnomasi (asli va nusxasi)",
     "Ota-ona pasport ma'lumotlari",
-    "3x4 o'lchamdagi 4 ta rangli rasm"
+    "3x4 ölçamdagi 4 ta rangli rasm"
   ];
 
   return (
@@ -20,11 +20,11 @@ export default function Admission({ currentSeason }) {
       <div className={`py-16 px-6 text-center text-white bg-gradient-to-r ${currentSeason?.heroBg || 'from-amber-600 to-orange-700'} shadow-lg`}>
         <div className="max-w-5xl mx-auto">
           <Link to="/" className="inline-block mb-6 px-5 py-2 bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md text-sm font-semibold transition">
-            ← Bosh sahifaga qaytish
+            ← Boş sahifaga qaytiş
           </Link>
-          <h1 className="text-4xl md:text-6xl font-black mb-4">O'quvchilarni Qabul Qilish</h1>
+          <h1 className="text-4xl md:text-6xl font-black mb-4">Öquvchilarni Qabul Qiliş</h1>
           <p className="text-xl md:text-2xl font-light opacity-90 max-w-3xl mx-auto">
-            Zarbdor Ixtisoslashtirilgan Maktabiga 2026-2027 o'quv yili uchun hujjat topshirish qoidalari va tartibi.
+            Zarbdor Ixtisoslaştirilgan maktabiga 2026-2027 öquv yili uçun hujjat topşiriş qoidalari va tartibi.
           </p>
         </div>
       </div>
@@ -33,7 +33,7 @@ export default function Admission({ currentSeason }) {
       <section className="max-w-6xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <span className="text-orange-600 font-extrabold text-sm uppercase tracking-wider">Tartib-qoida</span>
-          <h2 className="text-3xl md:text-4xl font-black mt-2">Qabul Jarayoni Bosqichlari</h2>
+          <h2 className="text-3xl md:text-4xl font-black mt-2">Qabul Jarayoni Bosqiçlari</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((item, idx) => (
@@ -51,8 +51,8 @@ export default function Admission({ currentSeason }) {
       <section className="bg-white py-16 border-y border-gray-200">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-black">Talab Etiladigan Hujjatlar</h2>
-            <p className="text-gray-600 text-lg mt-2">Ro'yxatdan o'tish va imtihon bosqichida quyidagi hujjatlar talab qilinadi:</p>
+            <h2 className="text-3xl md:text-4xl font-black">Talab etiladigan hujjatlar</h2>
+            <p className="text-gray-600 text-lg mt-2">Röyxatdan ötish va imtihon bosqiçida quyidagi hujjatlar talab qilinadi:</p>
           </div>
           <div className="bg-orange-50/60 p-8 rounded-3xl border border-orange-200 shadow-sm">
             <ul className="space-y-4">

@@ -463,7 +463,7 @@ export default function Collaboration() {
                       onClick={() => handleDeleteSchedule(item.id)}
                       className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700"
                     >
-                      🗑 Jadvalni o'chirish
+                      🗑 Jadvalni öçiriş
                     </button>
                   </div>
                 )}

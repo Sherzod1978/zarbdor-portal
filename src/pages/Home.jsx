@@ -9,7 +9,7 @@ export default function Home({ current }) {
         className="relative w-full min-h-[75vh] flex items-center justify-center text-center text-white bg-cover bg-center bg-no-repeat shadow-2xl"
         style={{ backgroundImage: `url('/school.jpg')` }}
       >
-        {/* Matnlar oson o'qilishi uchun to'q rangli shaffof qatlam (Overlay) */}
+        { }
         <div className="absolute inset-0 bg-black/55 backdrop-blur-[1px]"></div>
 
         {/* Rasm ustidagi kontent */}
