@@ -22,9 +22,9 @@ export default function About({ currentSeason }) {
       desc: "O'quvchilar o'rtasida ma'naviy-axloqiy muhitni shakllantirish va loyihalarni boshqarish."
     },
     { 
-      name: "Psixolog F.I.O.", // <-- Ismini yozasiz
+      name: "Iroda Nishonova ", 
       role: "Maktab Psixologi", 
-      image: "/psixolog.png", // <-- Rasmining Fayl nomi (agar bo'lmasa bo'sh qoldirsangiz 👤 belgisi chiqadi)
+      image: "/Iroda.jpg", 
       desc: "O'quvchilar bilan individual va guruhli psixologik maslahatlar hamda treninglar o'tkazish."
     }
   ];
