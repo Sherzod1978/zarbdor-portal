@@ -26,30 +26,29 @@ export default function App() {
       name: 'Kuz', 
       bgGradient: 'from-amber-100 via-orange-100 to-amber-200', 
       accentColor: 'text-amber-950', 
-      particles: ['🍁', '🍁', '🍁', '🍁', '🍁', '🍁', '🍁', '🍁']
+      particles: ['🍁'] 
     },
     winter: { 
       name: 'Qish', 
       bgGradient: 'from-slate-100 via-sky-100 to-blue-200', 
       accentColor: 'text-sky-950', 
-      particles: ['❄', '❅', '❆', '❄', '❅', '❆']
+      particles: ['❄'] 
     },
     spring: { 
       name: 'Bahor', 
       bgGradient: 'from-emerald-100 via-pink-100 to-teal-100', 
       accentColor: 'text-emerald-950', 
-      particles: ['🌸', '💧']
+      particles: ['🌸'] 
     },
     summer: { 
       name: 'Yoz', 
       bgGradient: 'from-yellow-100 via-amber-100 to-orange-200', 
       accentColor: 'text-amber-950',
-      particles: ['', '']      
+      particles: ['✨']      
     }
   };
 
   const current = seasonStyles[season];
-  const autumnColors = ['#facc15', '#f97316', '#dc2626'];
 
   return (
     <div className={`relative min-h-screen flex flex-col justify-between bg-gradient-to-br ${current.bgGradient} text-gray-900 transition-all duration-700 font-sans`}>
@@ -57,25 +56,17 @@ export default function App() {
       {/* Dynamic Seasonal Effects */}
       <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
         {current.particles.map((item, index) => {
-          const leftPos = Math.random() * 100;
-          const duration = 6 + Math.random() * 8;
-          const delay = Math.random() * 5;
-          const size = 0.8 + Math.random() * 0.8;
-          const isRain = item === '💧';
-          const particleColor = autumnColors[index % autumnColors.length];
-
           return (
             <span
               key={index}
-              className={`absolute top-0 select-none ${isRain ? 'animate-rain text-blue-400 font-bold' : 'animate-fall'}`}
+              className="absolute top-0 select-none animate-fall"
               style={{
-                left: `${leftPos}%`,
-                animationDuration: `${isRain ? duration * 0.4 : duration}s`,
-                animationDelay: `${delay}s`,
-                fontSize: `${size}rem`,
-                color: isRain || season !== 'autumn' ? undefined : particleColor,
+                left: '50%',
+                animationDuration: '12s',
+                animationIterationCount: 'infinite',
+                fontSize: '1.2rem',
                 filter: 'drop-shadow(0px 2px 3px rgba(0,0,0,0.15))',
-                opacity: 0.85
+                opacity: 0.6
               }}
             >
               {item}
@@ -88,9 +79,13 @@ export default function App() {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md border-b border-gray-200 px-6 py-4">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-6">
           
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 shrink-0">
-            <span className="text-3xl">🎓</span>
+          {/* Logo va Agentlik rasmi */}
+          <Link to="/" className="flex items-center space-x-3 shrink-0 group">
+            <img 
+              src="/logo.jpg" 
+              alt="Zarbdor IM Logo" 
+              className="h-10 w-10 object-cover rounded-xl shadow-md border border-gray-200 transition-transform group-hover:scale-105" 
+            />
             <span className={`text-2xl font-black ${current.accentColor}`}>Zarbdor IM</span>
           </Link>
 
