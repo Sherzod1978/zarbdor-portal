@@ -20,6 +20,12 @@ export default function About({ currentSeason }) {
       role: "Ma'naviy va ma'rifiy ishlar bo'yicha direktor o'rinbosari", 
       image: "/Dilfuza.jpg",
       desc: "O'quvchilar o'rtasida ma'naviy-axloqiy muhitni shakllantirish va loyihalarni boshqarish."
+    },
+    { 
+      name: "Psixolog F.I.O.", // <-- Ismini yozasiz
+      role: "Maktab Psixologi", 
+      image: "/psixolog.png", // <-- Rasmining Fayl nomi (agar bo'lmasa bo'sh qoldirsangiz 👤 belgisi chiqadi)
+      desc: "O'quvchilar bilan individual va guruhli psixologik maslahatlar hamda treninglar o'tkazish."
     }
   ];
 
@@ -69,49 +75,50 @@ export default function About({ currentSeason }) {
           </div>
         </div>
       </section>
-      {/* Maktab Rahbariyati (3 kishi yonma-yon) */}
-<section className="max-w-[1400px] mx-auto px-6 py-16">
-  <div className="text-center mb-12">
-    <h2 className="text-3xl md:text-4xl font-black text-gray-900">Maktab Rahbariyati</h2>
-    <p className="text-gray-600 text-lg mt-2">Tajribali va fidoyi jamoamiz bilan tanishing</p>
-  </div>
 
-  {/* Flexbox orqali 3 ta kartochka kafolatlangan holda yonma-yon joylashadi */}
-  <div 
-    style={{ 
-      display: 'flex', 
-      flexDirection: 'row', 
-      flexWrap: 'wrap', 
-      justifyContent: 'center', 
-      gap: '24px' 
-    }}
-  >
-    {management.map((person, idx) => (
-      <div 
-        key={idx} 
-        className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-all duration-300 flex flex-col items-center"
-        style={{ flex: '1 1 300px', maxWidth: '400px' }}
-      >
-        {person.image ? (
-          <div className="w-36 h-36 mb-6 rounded-full overflow-hidden shadow-lg border-4 border-orange-500 shrink-0">
-            <img src={person.image} alt={person.name} className="w-full h-full object-cover" />
-          </div>
-        ) : (
-          <div className="text-5xl mb-6 bg-orange-100 w-36 h-36 rounded-full flex items-center justify-center shrink-0">
-            👤
-          </div>
-        )}
+      {/* Maktab Rahbariyati */}
+      <section className="max-w-[1400px] mx-auto px-6 py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900">Maktab Rahbariyati va Mutaxassislar</h2>
+          <p className="text-gray-600 text-lg mt-2">Tajribali va fidoyi jamoamiz bilan tanishing</p>
+        </div>
 
-        <h3 className="text-xl font-bold text-gray-900 mb-2">{person.name}</h3>
-        <span className="inline-block px-3 py-1.5 bg-orange-100 text-orange-800 text-xs font-bold rounded-full mb-4">
-          {person.role}
-        </span>
-        <p className="text-gray-600 text-sm leading-relaxed">{person.desc}</p>
-      </div>
-    ))}
-  </div>
-</section>
-      {/* Sharoitlar — 4 ta blok yonma-yon 1 qatorda */}
+        <div 
+          style={{ 
+            display: 'flex', 
+            flexDirection: 'row', 
+            flexWrap: 'wrap', 
+            justifyContent: 'center', 
+            gap: '24px' 
+          }}
+        >
+          {management.map((person, idx) => (
+            <div 
+              key={idx} 
+              className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-all duration-300 flex flex-col items-center"
+              style={{ flex: '1 1 300px', maxWidth: '350px' }}
+            >
+              {person.image ? (
+                <div className="w-36 h-36 mb-6 rounded-full overflow-hidden shadow-lg border-4 border-orange-500 shrink-0">
+                  <img src={person.image} alt={person.name} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="text-5xl mb-6 bg-orange-100 w-36 h-36 rounded-full flex items-center justify-center shrink-0">
+                  👤
+                </div>
+              )}
+
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{person.name}</h3>
+              <span className="inline-block px-3 py-1.5 bg-orange-100 text-orange-800 text-xs font-bold rounded-full mb-4">
+                {person.role}
+              </span>
+              <p className="text-gray-600 text-sm leading-relaxed">{person.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Sharoitlar */}
       <section className="bg-white py-16 border-y border-gray-200">
         <div className="max-w-[1500px] mx-auto px-6">
           <div className="text-center mb-12">
@@ -119,7 +126,6 @@ export default function About({ currentSeason }) {
             <p className="text-gray-600 text-lg mt-2">Zamonaviy ta'lim uchun barcha imkoniyatlar bir joyda jamlangan</p>
           </div>
 
-          {/* Flexbox orqali 4 ta blok kafolatlangan holda 1 qatorga joylashadi */}
           <div 
             style={{ 
               display: 'flex', 
@@ -143,6 +149,6 @@ export default function About({ currentSeason }) {
           </div>
         </div>
       </section>
-      </div>
+    </div>
   );
 }
