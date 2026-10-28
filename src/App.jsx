@@ -114,7 +114,7 @@ export default function App() {
                   to="/login" 
                   className="block px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 font-semibold transition"
                 >
-                  🏫 O'qituvchi va o'quvchilar hamkorligi
+                  🏫 Öqituvçi va öquvçilar hamkorligi
                 </Link>
               </div>
             </div>
@@ -142,12 +142,12 @@ export default function App() {
 
             <Link to="/admission" className="hover:text-orange-600 transition">Qabul</Link>
             <Link to="/news" className="hover:text-orange-600 transition">Yangiliklar</Link>
-            <Link to="/contact" className="hover:text-orange-600 transition">Bog'lanish</Link>
+            <Link to="/contact" className="hover:text-orange-600 transition">Boğlaniş</Link>
           </nav>
         </div>
       </header>
 
-      {/* Asosiy Yo'nalishlar */}
+      {/* Asosiy Yönalişlar */}
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home current={current} searchQuery={searchQuery} />} />
@@ -201,7 +201,7 @@ export default function App() {
               </li>
               <li>
                 <Link to="/admission" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Qabul shartlari
+                  Qabul şartlari
                 </Link>
               </li>
               <li>
@@ -211,7 +211,7 @@ export default function App() {
               </li>
               <li>
                 <Link to="/contact" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Bog'lanish
+                  Boğlaniş
                 </Link>
               </li>
             </ul>
@@ -219,7 +219,7 @@ export default function App() {
         </div>
 
         <div className="border-t border-gray-800 pt-6 text-center text-xs md:text-sm text-gray-400">
-          © Zarbdor ixtisoslashtirilgan maktabi - 2026
+          © Zarbdor ixtisoslaştirilgan maktabi - 2026
         </div>
       </footer>
 

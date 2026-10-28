@@ -7,18 +7,18 @@ export default function News() {
   const initialNews = [
     {
       id: 1,
-      title: "Maktabimizda 'Zakovat' intellektual o'yini bo'lib o'tdi",
+      title: "Maktabimizda 'Zakovat' intellektual öyini bölib ötdi",
       date: '2026-10-20',
       category: 'Tadbirlar',
-      description: "O'quvchilarning mantiqiy fikrlash doirasini kengaytirish maqsadida maktabimizda yuqori sinf o'quvchilari o'rtasida 'Zakovat' turniri tashkil etildi.",
+      description: "Öquvçilarning mantiqiy fikrlash doirasini kengaytiriş maqsadida maktabimizda yuqori sinf öquvçilari örtasida 'Zakovat' turniri taşkil etildi.",
       image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
     },
     {
       id: 2,
-      title: "Robototexnika va IT bo'yicha yangi to'garaklar ish boshladi",
+      title: "Robototexnika va IT böyiça yangi tögaraklar ish boşladi",
       date: '2026-10-15',
       category: 'IT va Innovatsiya',
-      description: "Zarbdor IMda o'quvchilar uchun zamonaviy kompyuter va robototexnika vositalari bilan jihozlangan to'garak xonalari foydalanishga topshirildi.",
+      description: "Zarbdor IMda öquvçilar uchun zamonaviy kompyuter va robototexnika vositalari bilan jihozlangan tögarak xonalari foydalanishga topşirildi.",
       image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80'
     }
   ];
@@ -99,8 +99,8 @@ export default function News() {
       {/* Sarlavha va Admin tugmasi */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-gray-200 mb-8 flex flex-wrap justify-between items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">📰 Maktab Yangiliklari va E'lonlar</h1>
-          <p className="text-gray-600">Zarbdor ixtisoslashtirilgan maktabining eng so'nggi yangiliklari va muhim voqealari.</p>
+          <h1 className="text-3xl font-black text-gray-900 mb-2">📰 Maktab yangiliklari va e'lonlar</h1>
+          <p className="text-gray-600">Zarbdor ixtisoslaştirilgan maktabining eng sönggi yangiliklari va muhim voqealari.</p>
         </div>
         
         {!isAdmin ? (
@@ -108,14 +108,14 @@ export default function News() {
             onClick={() => setShowAdminLogin(true)}
             className="px-5 py-2.5 bg-gray-900 text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition shadow-md"
           >
-            ⚙️ Admin Boshqaruvi
+            ⚙️ Admin Boşqaruvi
           </button>
         ) : (
           <button 
             onClick={() => setIsAdmin(false)}
             className="px-5 py-2.5 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 transition shadow-md"
           >
-            🚪 Admin rejimidan chiqish
+            🚪 Admin rejimidan çiqiş
           </button>
         )}
       </div>
@@ -124,7 +124,7 @@ export default function News() {
       {showAdminLogin && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-2xl max-w-sm w-full shadow-2xl">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin Tizimiga Kirish</h3>
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin Tizimiga Kiriş</h3>
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <input
                 type="password"
@@ -140,13 +140,13 @@ export default function News() {
                   onClick={() => setShowAdminLogin(false)}
                   className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-xl text-xs"
                 >
-                  Bekor qilish
+                  Bekor qiliş
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-orange-600 text-white font-bold rounded-xl text-xs hover:bg-orange-700"
                 >
-                  Kirish
+                  Kiriş
                 </button>
               </div>
             </form>
@@ -158,12 +158,12 @@ export default function News() {
       {isAdmin && (
         <div className="bg-orange-50 border-2 border-orange-200 p-6 rounded-3xl mb-10 shadow-lg">
           <h2 className="text-xl font-black text-orange-900 mb-4 flex items-center gap-2">
-            <span>📝</span> Yangi Yangilik/E'lon Joylash (Admin Panel)
+            <span>📝</span> Yangi yangilik/E'lon joylaş (Admin Panel)
           </h2>
           <form onSubmit={handleAddNews} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2">
-                <label className="block text-xs font-bold text-gray-700 mb-1">Yangilik Sarlavhasi</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Yangilik sarlavhasi</label>
                 <input
                   type="text"
                   placeholder="Yangilik sarlavhasini kiriting..."
@@ -202,7 +202,7 @@ export default function News() {
             </div>
 
             <div className="pt-1">
-              <label className="block text-xs font-bold text-gray-700 mb-1">Yangilik Rasmini Tanlang (Ixtiyoriy)</label>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Yangilik rasmini tanlang (Ixtiyoriy)</label>
               <input
                 type="file"
                 accept="image/*"
@@ -215,7 +215,7 @@ export default function News() {
               type="submit"
               className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md shadow-orange-500/30 transition mt-2"
             >
-              Yangilikni E'lon Qilish
+              Yangilikni e'lon qiliş
             </button>
           </form>
         </div>
@@ -252,7 +252,7 @@ export default function News() {
                   onClick={() => handleDeleteNews(item.id)}
                   className="px-4 py-2 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition"
                 >
-                  🗑 Yangilikni O'chirish
+                  🗑 Yangilikni öchiriş
                 </button>
               </div>
             )}

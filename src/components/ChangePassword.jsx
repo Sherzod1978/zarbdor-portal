@@ -26,20 +26,20 @@ export default function ChangePassword() {
       const data = await response.json();
 
       if (response.ok) {
-        setStatus({ type: 'success', msg: data.message || "Parol muvaffaqiyatli o'zgartirildi!" });
+        setStatus({ type: 'success', msg: data.message || "Parol muvaffaqiyatli özgartirildi!" });
         setOldPassword('');
         setNewPassword('');
       } else {
         setStatus({ type: 'error', msg: data.error || "Xatolik yuz berdi!" });
       }
     } catch (err) {
-      setStatus({ type: 'error', msg: "Server bilan aloqa yo'q!" });
+      setStatus({ type: 'error', msg: "Server bilan aloqa yöq!" });
     }
   };
 
   return (
     <div className="max-w-md mx-auto my-8 p-6 bg-slate-900 border border-orange-500/30 rounded-2xl shadow-xl text-white">
-      <h3 className="text-xl font-bold mb-6 text-orange-500 text-center">Parolni o'zgartirish</h3>
+      <h3 className="text-xl font-bold mb-6 text-orange-500 text-center">Parolni özgartiriş</h3>
       
       {status.msg && (
         <div className={`p-3 rounded-xl mb-4 text-sm font-semibold text-center border ${
@@ -78,7 +78,7 @@ export default function ChangePassword() {
           type="submit"
           className="w-full py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold rounded-xl transition shadow-md shadow-orange-600/20"
         >
-          Parolni yangilash
+          Parolni yangilaş
         </button>
       </form>
     </div>

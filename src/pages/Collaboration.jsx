@@ -3,27 +3,27 @@ import React, { useState, useEffect } from 'react';
 export default function Collaboration() {
   // Dastlabki namunaviy dars jadvali
   const initialSchedules = [
-    { id: 1, day: 'Dushanba', classNum: '9-A', subjects: 'Matematika, Fizika, Informatika, Ingliz tili' },
-    { id: 2, day: 'Seshanba', classNum: '9-A', subjects: 'Informatika (Robototexnika), Kimyo, Biologiya, Tarix' },
-    { id: 3, day: 'Chorshanba', classNum: '10-B', subjects: 'Matematika (Algebra), Ona tili, Fizika, Geometriya' }
+    { id: 1, day: 'Duşanba', classNum: '9-A', subjects: 'Matematika, Fizika, Informatika, Ingliz tili' },
+    { id: 2, day: 'Seşanba', classNum: '9-A', subjects: 'Informatika (Robototexnika), Kimyo, Biologiya, Tarix' },
+    { id: 3, day: 'Çorşanba', classNum: '10-B', subjects: 'Matematika (Algebra), Ona tili, Fizika, Geometriya' }
   ];
 
   // Dastlabki fanlar va ularning darslari
   const initialSubjects = {
     Matematika: {
-      teacher: "M. Anorov (Oliy toifali o'qituvchi)",
+      teacher: "K. Mamadıyorov (Oliy toifali öqituvçi)",
       videos: [
         { title: '1-mavzu: Hosila va uning tatbiqi', duration: '45 min', link: '#' },
         { title: '2-mavzu: Integrallar va yuzlarni hisoblash', duration: '50 min', link: '#' }
       ],
       tests: [
-        { title: '1-bosqich test nazorati (15 ta savol)', questions: 15 }
+        { title: '1-bosqiç test nazorati (15 ta savol)', questions: 15 }
       ]
     },
     Informatika: {
       teacher: 'Sh. Amanov (IT mutaxassisi)',
       videos: [
-        { title: 'Python dasturlash tiliga kirish', duration: '60 min', link: '#' },
+        { title: 'Python dasturlaş tiliga kirish', duration: '60 min', link: '#' },
         { title: 'LEGO EV3 Pybricks MicroPython asoslari', duration: '40 min', link: '#' }
       ],
       tests: [
@@ -437,7 +437,7 @@ export default function Collaboration() {
       {activeTab === 'schedule' && (
         <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <span>📅</span> Maktab Haftalik Dars Jadvali
+            <span>📅</span> Maktab haftalik dars jadvali
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
