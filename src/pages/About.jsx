@@ -1,72 +1,78 @@
-import Contact from './pages/Contact';
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
-import Home from './pages/Home';
-import About from './pages/About';
-import Admission from './pages/Admission';
-import News from './pages/News';
-import Login from './pages/Login';
-import Collaboration from './pages/Collaboration';
-import Achievements from './pages/Achievements';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
-export default function App() {
-  const [season, setSeason] = useState('autumn');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    const month = new Date().getMonth() + 1;
-    if (month >= 3 && month <= 5) setSeason('spring');
-    else if (month >= 6 && month <= 8) setSeason('summer');
-    else if (month >= 9 && month <= 11) setSeason('autumn');
-    else setSeason('winter');
-  }, []);
-
-  const seasonStyles = {
-    autumn: { 
-      name: 'Kuz', 
-      bgGradient: 'from-amber-100 via-orange-100 to-amber-200', 
-      accentColor: 'text-amber-950', 
-      particles: ['🍁'] 
-    },
-    winter: { 
-      name: 'Qish', 
-      bgGradient: 'from-slate-100 via-sky-100 to-blue-200', 
-      accentColor: 'text-sky-950', 
-      particles: ['❄'] 
-    },
-    spring: { 
-      name: 'Bahor', 
-      bgGradient: 'from-emerald-100 via-pink-100 to-teal-100', 
-      accentColor: 'text-emerald-950', 
-      particles: ['🌸'] 
-    },
-    summer: { 
-      name: 'Yoz', 
-      bgGradient: 'from-yellow-100 via-amber-100 to-orange-200', 
-      accentColor: 'text-amber-950',
-      particles: ['✨']      
-    }
+export default function About({ currentSeason }) {
+  // Agar App.js dan currentSeason kelmasa, xatolik chiqmasligi uchun standart qiymat
+  const current = currentSeason || {
+    name: 'Kuz', 
+    bgGradient: 'from-amber-100 via-orange-100 to-amber-200', 
+    heroBg: 'from-amber-600 to-orange-700',
+    accentColor: 'text-amber-950', 
+    particles: ['🍁', '🍁', '🍁']
   };
 
-  const current = seasonStyles[season];
+  const management = [
+    { 
+      name: "Feruz Qarabayev", 
+      role: "Maktab Direktori", 
+      image: "/direktor.png",
+      desc: "Maktab faoliyatini boshqarish va ta'lim sifatini nazorat qilish bo'yicha yuqori tajribaga ega rahbar."
+    },
+    { 
+      name: "Şohjahon Amirov", 
+      role: "Öquv işlari böyicha direktor örinbosari", 
+      image: "/Amirov.png",
+      desc: "Öquv jarayonini rejalashtirish va ilğor pedagogik texnologiyalarni joriy etiş."
+    },
+    { 
+      name: "Dilfuza Bekamova", 
+      role: "Ma'naviy va ma'rifiy işlar böyiça direktor örinbosari", 
+      image: "/Dilfuza.jpg",
+      desc: "Öquvçilar örtasida ma'naviy-axloqiy muhitni şakllantiriş va loyihalarni boşqariş."
+    },
+    { 
+      name: "Iroda Nixonova", 
+      role: "Maktab Psixologi", 
+      image: "/Iroda.jpg", 
+      desc: "Öquvçilar bilan psixologik treninglar va maslahatlar ötkaziş."
+    },
+    { 
+      name: "Ixtiyor Pirimqulov", 
+      role: "Maktab Maslahatchisi", 
+      image: "/Ixtiyor.jpg", 
+      desc: "Öquvçilar bilan turli treninglar va maslahatlar ötkaziş."
+    }
+  ];
+
+  const features = [
+    { title: "Zamonaviy IT Laboratoriya", desc: "Sönggi rusumdagi kompyuterlar, 3D printerlar va robototexnika töplamlari.", icon: "💻" },
+    { title: "Şinam va şaffof sinflar", desc: "Interaktiv doskalar hamda qulay ergonomik mebellar bilan jihozlangan.", icon: "🏫" },
+    { title: "Sport va salomatlik", desc: "Yopiq va oçiq sport maydonchalari, voleybol va futbol tögaraklari.", icon: "⚽" },
+    { title: "Boy Kutubxona va Media-markaz", desc: "Minglab ilmiy, badiiy va elektron kitoblar bazasi.", icon: "📚" }
+  ];
 
   return (
-    <div className={`relative min-h-screen flex flex-col justify-between bg-gradient-to-br ${current.bgGradient} text-gray-900 transition-all duration-700 font-sans`}>
+    <div className={`relative min-h-screen bg-gradient-to-br ${current.bgGradient} text-gray-900 transition-all duration-700 font-sans pb-20 overflow-hidden`}>
       
-      {/* Dynamic Seasonal Effects */}
+      {/* Dinamik Fasl Effektlari */}
       <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
-        {current.particles.map((item, index) => {
+        {current.particles && current.particles.map((item, index) => {
+          const leftPos = Math.random() * 100;
+          const duration = 6 + Math.random() * 8;
+          const delay = Math.random() * 5;
+          const size = 0.9 + Math.random() * 0.8;
+
           return (
             <span
               key={index}
               className="absolute top-0 select-none animate-fall"
               style={{
-                left: '50%',
-                animationDuration: '12s',
-                animationIterationCount: 'infinite',
-                fontSize: '1.2rem',
+                left: `${leftPos}%`,
+                animationDuration: `${duration}s`,
+                animationDelay: `${delay}s`,
+                fontSize: `${size}rem`,
                 filter: 'drop-shadow(0px 2px 3px rgba(0,0,0,0.15))',
-                opacity: 0.6
+                opacity: 0.85
               }}
             >
               {item}
@@ -75,154 +81,117 @@ export default function App() {
         })}
       </div>
 
-      {/* Header & Navbar */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md border-b border-gray-200 px-6 py-4">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-6">
-          
-          {/* Logo va Agentlik rasmi */}
-          <Link to="/" className="flex items-center space-x-3 shrink-0 group">
-            <img 
-              src="/logo.jpg" 
-              alt="Zarbdor IM Logo" 
-              className="h-10 w-10 object-cover rounded-xl shadow-md border border-gray-200 transition-transform group-hover:scale-105" 
-            />
-            <span className={`text-2xl font-black ${current.accentColor}`}>Zarbdor IM</span>
+      {/* Banner */}
+      <div className={`py-16 px-6 text-center text-white bg-gradient-to-r ${current.heroBg} shadow-lg relative z-10`}>
+        <div className="max-w-5xl mx-auto">
+          <Link to="/" className="inline-block mb-6 px-5 py-2 bg-white/20 hover:bg-white/30 rounded-full backdrop-blur-md text-sm font-semibold transition">
+            ← Bosh sahifaga qaytish
           </Link>
-
-          {/* Qidiruv oynasi */}
-          <div className="relative flex-1 max-w-md hidden md:block">
-            <input
-              type="text"
-              placeholder="Maktab böylab qidiruv..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-gray-100 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white transition-all shadow-inner"
-            />
-            <span className="absolute left-3.5 top-2.5 text-gray-400 text-sm">🔍</span>
-          </div>
-
-          {/* Menyu Navigatsiyasi */}
-          <nav className="flex items-center space-x-6 text-base font-bold shrink-0">
-            
-            {/* Bosh sahifa Dropdown */}
-            <div className="relative group py-2">
-              <Link to="/" className="hover:text-orange-600 transition flex items-center gap-1">
-                Boş sahifa ▾
-              </Link>
-              <div className="absolute top-full left-0 w-64 bg-white shadow-xl rounded-2xl border border-gray-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
-                <Link 
-                  to="/login" 
-                  className="block px-4 py-3 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 font-semibold transition"
-                >
-                  🏫 Öqituvçi va öquvçilar hamkorligi
-                </Link>
-              </div>
-            </div>
-
-            {/* Maktab haqida Dropdown */}
-            <div className="relative group py-2">
-              <Link to="/about" className="hover:text-orange-600 transition flex items-center gap-1">
-                Maktab haqida ▾
-              </Link>
-              <div className="absolute top-full left-0 w-56 bg-white shadow-xl rounded-2xl border border-gray-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
-                <Link 
-                  to="/about" 
-                  className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 font-semibold transition"
-                >
-                  ℹ️ Biz haqimizda
-                </Link>
-                <Link 
-                  to="/achievements" 
-                  className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 font-semibold transition border-t border-gray-50"
-                >
-                  🏆 Yutuqlar
-                </Link>
-              </div>
-            </div>
-
-            <Link to="/admission" className="hover:text-orange-600 transition">Qabul</Link>
-            <Link to="/news" className="hover:text-orange-600 transition">Yangiliklar</Link>
-            <Link to="/contact" className="hover:text-orange-600 transition">Boğlanish</Link>
-          </nav>
+          <h1 className="text-4xl md:text-6xl font-black mb-4 text-white drop-shadow-md">
+            Maktabimiz Haqida
+          </h1>
+          <p className="text-xl md:text-2xl font-medium text-white/95 max-w-3xl mx-auto leading-relaxed">
+            Zarbdor Ixtisoslashtirilgan Maktabi — iqtidorli yoshlarni kashf etuvchi va ularni kelajak yetakchilariga aylantiruvchi maskan.
+          </p>
         </div>
-      </header>
+      </div>
 
-      {/* Asosiy Yo'nalishlar */}
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home current={current} searchQuery={searchQuery} />} />
-          <Route path="/about" element={<About currentSeason={current} />} />
-          <Route path="/achievements" element={<Achievements />} />
-          <Route path="/admission" element={<Admission currentSeason={current} />} />
-          <Route path="/news" element={<News currentSeason={current} />} />
-          <Route path="/contact" element={<Contact currentSeason={current} />} />
-          <Route path="/login" element={<Login currentSeason={current} />} />
-          <Route path="/collaboration" element={<Collaboration />} />
-        </Routes>
-      </main>
+      {/* Tarix va Missiya */}
+      <section className="max-w-6xl mx-auto px-6 py-16 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <span className="text-orange-600 font-extrabold text-sm uppercase tracking-wider">Bizning Missiyamiz</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold mt-2 mb-6">Kelajak Texnologiyalari va Mukammal Ta'lim</h2>
+            <p className="text-lg text-gray-700 leading-relaxed mb-4">
+              Maktabimiz o'quvchilarga chuqurlashtirilgan aniq va tabiiy fanlar, zamonaviy axborot texnologiyalari hamda xorijiy tillarni mukammal o'rgatishga ixtisoslashgan.
+            </p>
+            <p className="text-lg text-gray-700 leading-relaxed">
+              Biz har bir o'quvchining shaxsiy iqtidorini yuzaga chiqarish uchun xavfsiz, zamonaviy va rag'batlantiruvchi ta'lim muhitini yaratamiz.
+            </p>
+          </div>
+          <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden">
+            <div className="text-6xl mb-4">🏛️</div>
+            <h3 className="text-2xl font-bold mb-2">Prezident Agentligi Tizimida</h3>
+            <p className="text-gray-600 text-lg">
+              Ixtisoslashtirilgan ta'lim muassasalari agentligi tizimiga kiruvchi ushbu maktabda darslar xalqaro standartlar va ilg'or metodikalar asosida olib boriladi.
+            </p>
+          </div>
+        </div>
+      </section>
 
-      {/* Footer */}
-      <footer className="bg-[#1f1f1f] text-white pt-12 pb-8 border-t border-gray-800 z-10 relative">
+      {/* Maktab Rahbariyati va Mutaxassislar */}
+      <section className="max-w-[1400px] mx-auto px-6 py-16 relative z-10">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900">Maktab Rahbariyati va Mutaxassislar</h2>
+          <p className="text-gray-600 text-lg mt-2">Tajribali va fidoyi jamoamiz bilan tanishing</p>
+        </div>
+
         <div 
           style={{ 
             display: 'flex', 
             flexDirection: 'row', 
-            justifyContent: 'space-around', 
-            alignItems: 'flex-start',
             flexWrap: 'wrap', 
-            maxWidth: '1200px', 
-            margin: '0 auto', 
-            padding: '0 20px',
-            gap: '40px'
+            justifyContent: 'center', 
+            gap: '24px' 
           }}
-          className="mb-10"
         >
-          <div style={{ minWidth: '280px' }}>
-            <h3 className="text-xl font-bold mb-4 text-white">Zarbdor IM</h3>
-            <div className="space-y-2 text-gray-300 text-sm md:text-base leading-relaxed">
-              <p><span className="font-semibold text-white">Manzil:</span> Jizzax viloyati, Zarbdor tumani</p>
-              <p><span className="font-semibold text-white">Tel:</span> +998 (94) 344-92-07</p>
-              <p><span className="font-semibold text-white">Email:</span> info@zarbdorim.uz</p>
+          {management.map((person, idx) => (
+            <div 
+              key={idx} 
+              className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-all duration-300 flex flex-col items-center"
+              style={{ flex: '1 1 280px', maxWidth: '360px' }}
+            >
+              {person.image ? (
+                <div className="w-36 h-36 mb-6 rounded-full overflow-hidden shadow-lg border-4 border-orange-500 shrink-0">
+                  <img src={person.image} alt={person.name} className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="text-5xl mb-6 bg-orange-100 w-36 h-36 rounded-full flex items-center justify-center shrink-0">
+                  👤
+                </div>
+              )}
+
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{person.name}</h3>
+              <span className="inline-block px-3 py-1.5 bg-orange-100 text-orange-800 text-xs font-bold rounded-full mb-4">
+                {person.role}
+              </span>
+              <p className="text-gray-600 text-sm leading-relaxed">{person.desc}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Sharoitlar */}
+      <section className="bg-white/80 backdrop-blur-md py-16 border-y border-gray-200 relative z-10">
+        <div className="max-w-[1500px] mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900">Maktabimizda yaratilgan şaroitlar</h2>
+            <p className="text-gray-600 text-lg mt-2">Zamonaviy ta'lim uçun barça imkoniyatlar bir joyda jamlangan</p>
           </div>
 
-          <div style={{ minWidth: '220px' }}>
-            <h3 className="text-xl font-bold mb-4 text-white">Tezkor havolalar</h3>
-            <ul className="space-y-2 text-sm md:text-base list-disc list-inside">
-              <li>
-                <Link to="/about" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Maktab haqida
-                </Link>
-              </li>
-              <li>
-                <Link to="/achievements" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Yutuqlar
-                </Link>
-              </li>
-              <li>
-                <Link to="/admission" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Qabul şartlari
-                </Link>
-              </li>
-              <li>
-                <Link to="/news" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Yangiliklar
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Boğlaniş
-                </Link>
-              </li>
-            </ul>
+          <div 
+            style={{ 
+              flexDirection: 'row', 
+              flexWrap: 'wrap', 
+              justifyContent: 'center', 
+              gap: '24px' 
+            }}
+            className="flex"
+          >
+            {features.map((item, idx) => (
+              <div 
+                key={idx} 
+                className="p-8 rounded-3xl bg-white border border-gray-100 hover:shadow-xl hover:-translate-y-1 transition duration-300 text-center flex flex-col items-center"
+                style={{ flex: '1 1 250px', maxWidth: '320px' }}
+              >
+                <div className="text-5xl mb-4">{item.icon}</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
-
-        <div className="border-t border-gray-800 pt-6 text-center text-xs md:text-sm text-gray-400">
-          © Zarbdor ixtisoslaştirilgan maktabi - 2026
-        </div>
-      </footer>
-
+      </section>
     </div>
   );
 }
