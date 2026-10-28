@@ -13,8 +13,7 @@ export default function About() {
     else setSeason('winter');
   }, []);
 
-  // Fasllar bo'yicha ranglar va elementlar (zarrachalar)
-  const seasonStyles = {
+    const seasonStyles = {
     autumn: { 
       name: 'Kuz', 
       bgGradient: 'from-amber-100 via-orange-100 to-amber-200', 
@@ -27,7 +26,7 @@ export default function About() {
       bgGradient: 'from-slate-100 via-sky-100 to-blue-200', 
       heroBg: 'from-sky-600 to-blue-800',
       accentColor: 'text-sky-950', 
-      particles: ['❄', '❅', '❅']
+      particles: ['❄',' ', '❅',' ','❅']
     },
     spring: { 
       name: 'Bahor', 
@@ -71,6 +70,12 @@ export default function About() {
   role: "Maktab Psixologi", 
   image: "/Iroda.jpg", // если файла нет, оставьте bo'sh: ""
   desc: "Öquvçilar bilan psixologik treninglar va maslahatlar ötkaziş."
+},
+    { 
+  name: "Ixtiyor Pirimqulov", 
+  role: "Maktab maslahatçısı", 
+  image: "/Ixtıyor.jpg", 
+  desc: "Öquvçilar bilan turlı treninglar va maslahatlar ötkaziş."
 }
   ];
 
@@ -121,7 +126,7 @@ export default function About() {
             Maktabimiz Haqida
           </h1>
           <p className="text-xl md:text-2xl font-medium text-white/95 max-w-3xl mx-auto leading-relaxed">
-            Zarbdor Ixtisoslashtirilgan Maktabi — iqtidorli yoshlarni kashf etuvchi va ularni kelajak yetakchilariga aylantiruvchi maskan.
+            Zarbdor Ixtisoslaştirilgan Maktabi — iqtidorli yoşlarni kaşf etuvçi va ularni kelajak yetakçilariga aylantiruvçi maskan.
           </p>
         </div>
       </div>
@@ -133,17 +138,17 @@ export default function About() {
             <span className="text-orange-600 font-extrabold text-sm uppercase tracking-wider">Bizning Missiyamiz</span>
             <h2 className="text-3xl md:text-4xl font-extrabold mt-2 mb-6">Kelajak Texnologiyalari va Mukammal Ta'lim</h2>
             <p className="text-lg text-gray-700 leading-relaxed mb-4">
-              Maktabimiz o'quvchilarga chuqurlashtirilgan aniq va tabiiy fanlar, zamonaviy axborot texnologiyalari hamda xorijiy tillarni mukammal o'rgatishga ixtisoslashgan.
+              Maktabimiz öquvçilarga çuqurlaştirilgan aniq va tabiiy fanlar, zamonaviy axborot texnologiyalari hamda xorijiy tillarni mukammal örgatişga ixtisoslaşgan.
             </p>
             <p className="text-lg text-gray-700 leading-relaxed">
-              Biz har bir o'quvchining shaxsiy iqtidorini yuzaga chiqarish uchun xavfsiz, zamonaviy va rag'batlantiruvchi ta'lim muhitini yaratamiz.
+              Biz har bir öquvçining şaxsiy iqtidorini yuzaga çiqariş uçun xavfsiz, zamonaviy va rağbatlantiruvçi ta'lim muhitini yaratamiz.
             </p>
           </div>
           <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden">
             <div className="text-6xl mb-4">🏛️</div>
             <h3 className="text-2xl font-bold mb-2">Prezident Agentligi Tizimida</h3>
             <p className="text-gray-600 text-lg">
-              Ixtisoslashtirilgan ta'lim muassasalari agentligi tizimiga kiruvchi ushbu maktabda darslar xalqaro standartlar va ilg'or metodikalar asosida olib boriladi.
+              Ixtisoslaştirilgan ta'lim muassasalari agentligi tizimiga kiruvçi uşbu maktabda darslar xalqaro standartlar va ilğor metodikalar asosida olib boriladi.
             </p>
           </div>
         </div>
