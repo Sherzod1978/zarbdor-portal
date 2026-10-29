@@ -29,18 +29,6 @@ export default function About({ currentSeason }) {
       role: "Ma'naviy va ma'rifiy işlar böyiça direktor örinbosari", 
       image: "/Dilfuza.jpg",
       desc: "Öquvçilar örtasida ma'naviy-axloqiy muhitni şakllantiriş va loyihalarni boşqariş."
-    },
-    { 
-      name: "Iroda Nixonova", 
-      role: "Maktab Psixologi", 
-      image: "/Iroda.jpg", 
-      desc: "Öquvçilar bilan psixologik treninglar va maslahatlar ötkaziş."
-    },
-    { 
-      name: "Ixtiyor Pirimqulov", 
-      role: "Maktab Maslahatchisi", 
-      image: "/Ixtiyor.jpg", 
-      desc: "Öquvçilar bilan turli treninglar va maslahatlar ötkaziş."
     }
   ];
 
@@ -119,7 +107,7 @@ export default function About({ currentSeason }) {
         </div>
       </section>
 
-      {/* Maktab Rahbariyati va Mutaxassislar */}
+     
       {/* Maktab Rahbariyati va Mutaxassislar */}
       <section className="max-w-[1600px] mx-auto px-6 py-16 relative z-10">
         <div className="text-center mb-12">
