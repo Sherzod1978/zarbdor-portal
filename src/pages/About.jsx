@@ -120,42 +120,35 @@ export default function About({ currentSeason }) {
       </section>
 
       {/* Maktab Rahbariyati va Mutaxassislar */}
-      <section className="max-w-[1400px] mx-auto px-6 py-16 relative z-10">
+      {/* Maktab Rahbariyati va Mutaxassislar */}
+      <section className="max-w-[1600px] mx-auto px-6 py-16 relative z-10">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-black text-gray-900">Maktab Rahbariyati va Mutaxassislar</h2>
           <p className="text-gray-600 text-lg mt-2">Tajribali va fidoyi jamoamiz bilan tanishing</p>
         </div>
 
-        <div 
-          style={{ 
-            display: 'flex', 
-            flexDirection: 'row', 
-            flexWrap: 'wrap', 
-            justifyContent: 'center', 
-            gap: '24px' 
-          }}
-        >
+        {/* lg ekranlarda aniq 5 ta ustun hosil qilamiz */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {management.map((person, idx) => (
             <div 
               key={idx} 
-              className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-all duration-300 flex flex-col items-center"
-              style={{ flex: '1 1 280px', maxWidth: '360px' }}
+              className="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-all duration-300 flex flex-col items-center"
             >
               {person.image ? (
-                <div className="w-36 h-36 mb-6 rounded-full overflow-hidden shadow-lg border-4 border-orange-500 shrink-0">
+                <div className="w-28 h-28 mb-4 rounded-full overflow-hidden shadow-lg border-4 border-orange-500 shrink-0">
                   <img src={person.image} alt={person.name} className="w-full h-full object-cover" />
                 </div>
               ) : (
-                <div className="text-5xl mb-6 bg-orange-100 w-36 h-36 rounded-full flex items-center justify-center shrink-0">
+                <div className="text-5xl mb-4 bg-orange-100 w-28 h-28 rounded-full flex items-center justify-center shrink-0">
                   👤
                 </div>
               )}
 
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{person.name}</h3>
-              <span className="inline-block px-3 py-1.5 bg-orange-100 text-orange-800 text-xs font-bold rounded-full mb-4">
+              <h3 className="text-lg font-bold text-gray-900 mb-1">{person.name}</h3>
+              <span className="inline-block px-2.5 py-1 bg-orange-100 text-orange-800 text-[11px] font-bold rounded-full mb-3">
                 {person.role}
               </span>
-              <p className="text-gray-600 text-sm leading-relaxed">{person.desc}</p>
+              <p className="text-gray-600 text-xs leading-relaxed">{person.desc}</p>
             </div>
           ))}
         </div>
