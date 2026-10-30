@@ -55,17 +55,17 @@ export default function News() {
     }
   };
 
-  const handleLogin = (e) => {
-  e.preventDefault();
-  // Вместо 'admin2026' укажите свой новый надежный пароль
-  if (password === 'Zarbdor@2026') { 
-    setIsAdmin(true);
-    setShowLoginModal(false);
-    setPassword('');
-  } else {
-    alert("Parol noto'g'ri!");
-  }
-};
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    // Parolni shu yerdan o'zingiz xohlagan boshqa parolga o'zgartirishingiz mumkin
+    if (adminPass === 'admin2026') { 
+      setIsAdmin(true);
+      setShowAdminLogin(false);
+      setAdminPass('');
+    } else {
+      alert("Parol noto'g'ri!");
+    }
+  };
 
   const handleAddNews = (e) => {
     e.preventDefault();
@@ -129,12 +129,11 @@ export default function News() {
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <input
                 type="password"
-                placeholder="Admin paroliga kiriting..."
+                placeholder="Admin parolini kiriting..."
                 value={adminPass}
                 onChange={(e) => setAdminPass(e.target.value)}
                 className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
               />
-              <div className="text-xs text-gray-500">Parol: <span className="font-bold">admin2026</span></div>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
