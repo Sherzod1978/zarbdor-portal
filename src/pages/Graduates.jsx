@@ -201,7 +201,7 @@ export default function Graduates({ currentSeason }) {
         {graduates.map((item) => (
           <div key={item.id} className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col justify-between hover:shadow-xl transition">
             <div>
-              <img src={item.image} alt={item.name} className="w-full h-56 object-cover" />
+              <img src={item.image} alt={item.name} className="w-full h-64 object-contain bg-gray-50" />
               <div className="p-5">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold px-3 py-1 bg-orange-100 text-orange-800 rounded-full">
