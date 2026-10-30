@@ -118,12 +118,12 @@ export default function App() {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md border-b border-gray-200 px-6 py-4">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-6">
           
-          {/* Logo va Agentlik rasmi */}
+          {/* Logo (Oq fonda ko'k logo uchun bg-white va p-1 qo'shildi) */}
           <Link to="/" className="flex items-center space-x-3 shrink-0 group">
             <img 
               src="/logo.jpg" 
               alt="Zarbdor IM Logo" 
-              className="h-10 w-10 object-cover rounded-xl shadow-md border border-gray-200 transition-transform group-hover:scale-105" 
+              className="h-10 w-10 object-contain bg-white p-1 rounded-xl shadow-md border border-gray-200 transition-transform group-hover:scale-105" 
             />
             <span className={`text-2xl font-black ${current.accentColor}`}>Zarbdor IM</span>
           </Link>
@@ -143,7 +143,7 @@ export default function App() {
           {/* Menyu Navigatsiyasi */}
           <nav className="flex items-center space-x-6 text-base font-bold shrink-0">
             
-            {/* Bosh sahifa Dropdown */}
+            {/* Boş sahifa Dropdown */}
             <div className="relative group py-2">
               <Link to="/" className="hover:text-orange-600 transition flex items-center gap-1">
                 Boş sahifa ▾
@@ -158,7 +158,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* Maktab haqida Dropdown */}
+            {/* Maktab haqida Dropdown (Bıtıruvçılar shu yerga qo'shildi) */}
             <div className="relative group py-2">
               <Link to="/about" className="hover:text-orange-600 transition flex items-center gap-1">
                 Maktab haqida ▾
@@ -176,12 +176,17 @@ export default function App() {
                 >
                   🏆 Yutuqlar
                 </Link>
+                <Link 
+                  to="/graduates" 
+                  className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 font-semibold transition border-t border-gray-50"
+                >
+                  🎓 Bıtıruvçılar
+                </Link>
               </div>
             </div>
 
             <Link to="/admission" className="hover:text-orange-600 transition">Qabul</Link>
             <Link to="/news" className="hover:text-orange-600 transition">Yangiliklar</Link>
-            <Link to="/graduates" className="hover:text-orange-600 transition">Bitiruvchilar</Link>
             <Link to="/contact" className="hover:text-orange-600 transition">Boğlaniş</Link>
           </nav>
         </div>
@@ -242,7 +247,7 @@ export default function App() {
               </li>
               <li>
                 <Link to="/graduates" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Bitiruvchilar
+                  Bıtıruvçılar
                 </Link>
               </li>
               <li>
