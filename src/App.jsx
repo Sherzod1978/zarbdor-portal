@@ -8,6 +8,7 @@ import News from './pages/News';
 import Login from './pages/Login';
 import Collaboration from './pages/Collaboration';
 import Achievements from './pages/Achievements';
+import Graduates from './pages/Graduates';
 
 export default function App() {
   const [season, setSeason] = useState('autumn');
@@ -107,7 +108,7 @@ export default function App() {
             {/* Bosh sahifa Dropdown */}
             <div className="relative group py-2">
               <Link to="/" className="hover:text-orange-600 transition flex items-center gap-1">
-                Bosh sahifa ▾
+                Boş sahifa ▾
               </Link>
               <div className="absolute top-full left-0 w-64 bg-white shadow-xl rounded-2xl border border-gray-100 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
                 <Link 
@@ -158,6 +159,7 @@ export default function App() {
           <Route path="/contact" element={<Contact currentSeason={current} />} />
           <Route path="/login" element={<Login currentSeason={current} />} />
           <Route path="/collaboration" element={<Collaboration />} />
+          <Route path="/graduates" element={<Graduates currentSeason={current} />} />
         </Routes>
       </main>
 
