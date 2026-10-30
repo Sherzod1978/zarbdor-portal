@@ -73,7 +73,6 @@ export default function Collaboration() {
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
-    // Bu yerda parolni o'zingiz xohlagan boshqa parolga o'zgartirishingiz mumkin
     if (adminPass === 'admin2026') {
       setIsAdmin(true);
       setShowAdminLogin(false);
@@ -134,6 +133,22 @@ export default function Collaboration() {
     setVideoDuration('');
     setVideoLink('');
     alert("Videodars muvaffaqiyatli qöşildi!");
+  };
+
+  // Videoni o'chirish funksiyasi
+  const handleDeleteVideo = (subjectName, videoIndex) => {
+    if (window.confirm("Ushbu videoni o'chirmoqchimisiz?")) {
+      const sub = subjectsData[subjectName];
+      const updatedVideos = sub.videos.filter((_, idx) => idx !== videoIndex);
+      const updated = {
+        ...subjectsData,
+        [subjectName]: {
+          ...sub,
+          videos: updatedVideos
+        }
+      };
+      setSubjectsData(updated);
+    }
   };
 
   // Dars jadvali qo'shish
@@ -391,9 +406,20 @@ export default function Collaboration() {
                         <h4 className="font-bold text-gray-900">{vid.title}</h4>
                         <span className="text-xs text-gray-500">Davomiyligi: {vid.duration}</span>
                       </div>
-                      <a href={vid.link} target="_blank" rel="noreferrer" className="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-xl hover:bg-orange-700 transition">
-                        Köriş ➔
-                      </a>
+                      <div className="flex items-center gap-2">
+                        <a href={vid.link} target="_blank" rel="noreferrer" className="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-xl hover:bg-orange-700 transition">
+                          Köriş ➔
+                        </a>
+                        {isAdmin && (
+                          <button
+                            onClick={() => handleDeleteVideo(selectedSubject, idx)}
+                            className="px-3 py-2 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition"
+                            title="Videoni o'chirish"
+                          >
+                            🗑
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
