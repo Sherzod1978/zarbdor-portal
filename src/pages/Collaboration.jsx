@@ -11,10 +11,10 @@ export default function Collaboration() {
   // Dastlabki fanlar va ularning darslari
   const initialSubjects = {
     Matematika: {
-      teacher: "K. Mamadıyorov (Oliy toifali öqituvçi)",
+      teacher: "K. Mamadiyorov (Oliy toifali öqituvçi)",
       videos: [
         { title: '1-mavzu: Hosila va uning tatbiqi', duration: '45 min', link: '#' },
-        { title: '2-mavzu: Integrallar va yuzlarni hisoblash', duration: '50 min', link: '#' }
+        { title: '2-mavzu: Integrallar va yuzlarni hisoblaş', duration: '50 min', link: '#' }
       ],
       tests: [
         { title: '1-bosqiç test nazorati (15 ta savol)', questions: 15 }
@@ -27,7 +27,7 @@ export default function Collaboration() {
         { title: 'LEGO EV3 Pybricks MicroPython asoslari', duration: '40 min', link: '#' }
       ],
       tests: [
-        { title: 'Python asoslari bo\'yicha test', questions: 20 }
+        { title: 'Python asoslari böyiça test', questions: 20 }
       ]
     }
   };
@@ -105,7 +105,7 @@ export default function Collaboration() {
     setSelectedSubject(newSubjectName);
     setNewSubjectName('');
     setNewTeacherName('');
-    alert("Yangi fan muvaffaqiyatli qo'shildi!");
+    alert("Yangi fan muvaffaqiyatli qöşildi!");
   };
 
   // Tanlangan fanga videodars qo'shish
@@ -132,7 +132,7 @@ export default function Collaboration() {
     setVideoTitle('');
     setVideoDuration('');
     setVideoLink('');
-    alert("Videodars muvaffaqiyatli qo'shildi!");
+    alert("Videodars muvaffaqiyatli qöşildi!");
   };
 
   // Dars jadvali qo'shish
@@ -154,7 +154,7 @@ export default function Collaboration() {
 
   // Dars jadvalini o'chirish
   const handleDeleteSchedule = (id) => {
-    if (window.confirm("Ushbu dars jadvalini o'chirmoqchimisiz?")) {
+    if (window.confirm("Uşbu dars jadvalini öchirmoqçimisiz?")) {
       setSchedules(schedules.filter(item => item.id !== id));
     }
   };
@@ -167,8 +167,8 @@ export default function Collaboration() {
       {/* Sarlavha va Admin tugmasi */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-gray-200 mb-8 flex flex-wrap justify-between items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">🎓 O'qituvchi va O'quvchilar Hamkorligi</h1>
-          <p className="text-gray-600">Maktab bazasidagi maxsus o'quv kurslari, dars jadvallari, videodarslar va testlar markazi.</p>
+          <h1 className="text-3xl font-black text-gray-900 mb-2">🎓 Öqituvçi va öquvçilar hamkorligi</h1>
+          <p className="text-gray-600">Maktab bazasidagi maxsus öquv kurslari, dars jadvallari, videodarslar va testlar markazi.</p>
         </div>
 
         {!isAdmin ? (
@@ -176,51 +176,55 @@ export default function Collaboration() {
             onClick={() => setShowAdminLogin(true)}
             className="px-5 py-2.5 bg-gray-900 text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition shadow-md"
           >
-            ⚙️ Admin Boshqaruvi
+            ⚙️ Admin boşqaruvi
           </button>
         ) : (
           <button 
             onClick={() => setIsAdmin(false)}
             className="px-5 py-2.5 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 transition shadow-md"
           >
-            🚪 Admin rejimidan chiqish
+            🚪 Admin rejimidan çiqiş
           </button>
         )}
       </div>
 
       {/* Admin Login Modali */}
-      {showAdminLogin && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-2xl max-w-sm w-full shadow-2xl">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin Tizimiga Kirish</h3>
-            <form onSubmit={handleAdminLogin} className="space-y-4">
-              <input
-                type="password"
-                placeholder="Admin paroliga kiriting..."
-                value={adminPass}
-                onChange={(e) => setAdminPass(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
-              />
-              <div className="text-xs text-gray-500">Parol: <span className="font-bold">admin2026</span></div>
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAdminLogin(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-xl text-xs"
-                >
-                  Bekor qilish
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-orange-600 text-white font-bold rounded-xl text-xs hover:bg-orange-700"
-                >
-                  Kirish
-                </button>
-              </div>
-            </form>
-          </div>
+      {/* O'zgarmasdan oldingi holatda `Parol: admin2026` degan <p> yoki <span> bor edi */}
+
+{showAdminModal && (
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+      <h3 className="text-xl font-bold mb-4 text-gray-900">Admin tizimiga kiriş</h3>
+      <form onSubmit={handleAdminLogin}>
+        <input 
+          type="password"
+          placeholder="Admin parolini kiriting..."
+          value={adminPasswordInput}
+          onChange={(e) => setAdminPasswordInput(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
+        
+        {/* BU YERDAGI "Parol: admin2026" YOZUVINI O'CHIRIB TASHMAYMIZ */}
+
+        <div className="flex justify-end gap-3">
+          <button 
+            type="button" 
+            onClick={() => setShowAdminModal(false)}
+            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium"
+          >
+            Bekor qiliş
+          </button>
+          <button 
+            type="submit" 
+            className="px-5 py-2 bg-orange-600 text-white rounded-xl hover:bg-orange-500 transition font-bold"
+          >
+            Kiriş
+          </button>
         </div>
-      )}
+      </form>
+    </div>
+  </div>
+)}
 
       {/* Admin Panel (Kodlarsiz Fan, Dars va Jadval Qo'shish) */}
       {isAdmin && (
