@@ -13,6 +13,7 @@ import Graduates from './pages/Graduates';
 export default function App() {
   const [season, setSeason] = useState('autumn');
   const [searchQuery, setSearchQuery] = useState('');
+  const [randomSparkles, setRandomSparkles] = useState([]);
 
   useEffect(() => {
     const month = new Date().getMonth() + 1;
@@ -22,12 +23,33 @@ export default function App() {
     else setSeason('winter');
   }, []);
 
+  // Yoz mavsumi uchun tasodifiy yulduzchalar generatori
+  useEffect(() => {
+    if (season !== 'summer') {
+      setRandomSparkles([]);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      const newSparkle = {
+        id: Date.now(),
+        top: Math.random() * 85 + 5, // Ekrandagi balandlik (5% - 90%)
+        left: Math.random() * 90 + 5, // Ekrandagi eni (5% - 95%)
+        scale: Math.random() * 0.8 + 0.8,
+      };
+
+      setRandomSparkles((prev) => [...prev.slice(-8), newSparkle]); // Bir vaqtning o'zida ko'pi bilan 8 ta yulduz tursin
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, [season]);
+
   const seasonStyles = {
     autumn: { 
       name: 'Kuz', 
       bgGradient: 'from-amber-100 via-orange-100 to-amber-200', 
       accentColor: 'text-amber-950', 
-      particles: ['🍁'] 
+      particles: ['🍁','🍁'] 
     },
     winter: { 
       name: 'Qish', 
@@ -56,13 +78,29 @@ export default function App() {
       
       {/* Dynamic Seasonal Effects */}
       <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
-        {current.particles.map((item, index) => {
-          return (
+        {season === 'summer' ? (
+          // Yoz uchun tasodifiy yonib-o'chuvchi yulduzchalar
+          randomSparkles.map((item) => (
+            <span
+              key={item.id}
+              className="absolute animate-ping text-xl opacity-80 duration-700 select-none"
+              style={{
+                top: `${item.top}%`,
+                left: `${item.left}%`,
+                transform: `scale(${item.scale})`,
+              }}
+            >
+              ✨
+            </span>
+          ))
+        ) : (
+          // Boshqa mavsumlar uchun tushuvchi elementlar
+          current.particles.map((item, index) => (
             <span
               key={index}
               className="absolute top-0 select-none animate-fall"
               style={{
-                left: '50%',
+                left: `${(index + 1) * 20}%`,
                 animationDuration: '12s',
                 animationIterationCount: 'infinite',
                 fontSize: '1.2rem',
@@ -72,8 +110,8 @@ export default function App() {
             >
               {item}
             </span>
-          );
-        })}
+          ))
+        )}
       </div>
 
       {/* Header & Navbar */}
@@ -143,6 +181,7 @@ export default function App() {
 
             <Link to="/admission" className="hover:text-orange-600 transition">Qabul</Link>
             <Link to="/news" className="hover:text-orange-600 transition">Yangiliklar</Link>
+            <Link to="/graduates" className="hover:text-orange-600 transition">Bitiruvchilar</Link>
             <Link to="/contact" className="hover:text-orange-600 transition">Boğlaniş</Link>
           </nav>
         </div>
@@ -199,6 +238,11 @@ export default function App() {
               <li>
                 <Link to="/achievements" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
                   Yutuqlar
+                </Link>
+              </li>
+              <li>
+                <Link to="/graduates" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
+                  Bitiruvchilar
                 </Link>
               </li>
               <li>
