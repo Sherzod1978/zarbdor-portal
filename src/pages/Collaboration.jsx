@@ -73,6 +73,7 @@ export default function Collaboration() {
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
+    // Bu yerda parolni o'zingiz xohlagan boshqa parolga o'zgartirishingiz mumkin
     if (adminPass === 'admin2026') {
       setIsAdmin(true);
       setShowAdminLogin(false);
@@ -189,48 +190,44 @@ export default function Collaboration() {
       </div>
 
       {/* Admin Login Modali */}
-      {/* O'zgarmasdan oldingi holatda `Parol: admin2026` degan <p> yoki <span> bor edi */}
+      {showAdminLogin && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin tizimiga kiriş</h3>
+            <form onSubmit={handleAdminLogin}>
+              <input 
+                type="password"
+                placeholder="Admin parolini kiriting..."
+                value={adminPass}
+                onChange={(e) => setAdminPass(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
 
-{showAdminModal && (
-  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
-      <h3 className="text-xl font-bold mb-4 text-gray-900">Admin tizimiga kiriş</h3>
-      <form onSubmit={handleAdminLogin}>
-        <input 
-          type="password"
-          placeholder="Admin parolini kiriting..."
-          value={adminPasswordInput}
-          onChange={(e) => setAdminPasswordInput(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
-        />
-        
-        {/* BU YERDAGI "Parol: admin2026" YOZUVINI O'CHIRIB TASHMAYMIZ */}
-
-        <div className="flex justify-end gap-3">
-          <button 
-            type="button" 
-            onClick={() => setShowAdminModal(false)}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium"
-          >
-            Bekor qiliş
-          </button>
-          <button 
-            type="submit" 
-            className="px-5 py-2 bg-orange-600 text-white rounded-xl hover:bg-orange-500 transition font-bold"
-          >
-            Kiriş
-          </button>
+              <div className="flex justify-end gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAdminLogin(false)}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium"
+                >
+                  Bekor qiliş
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-5 py-2 bg-orange-600 text-white rounded-xl hover:bg-orange-500 transition font-bold"
+                >
+                  Kiriş
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
 
-      {/* Admin Panel (Kodlarsiz Fan, Dars va Jadval Qo'shish) */}
+      {/* Admin Panel */}
       {isAdmin && (
         <div className="bg-orange-50 border-2 border-orange-200 p-6 rounded-3xl mb-10 shadow-lg space-y-6">
           <h2 className="text-xl font-black text-orange-900 flex items-center gap-2">
-            <span>🛠</span> LMS va Dars Jadvalini Boshqarish (Admin Panel)
+            <span>🛠</span> LMS va dars jadvalini boshqarish (Admin Panel)
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -248,14 +245,14 @@ export default function Collaboration() {
               />
               <input
                 type="text"
-                placeholder="O'qituvchi F.I.Sh."
+                placeholder="Öqituvçi F.I.Ş."
                 value={newTeacherName}
                 onChange={(e) => setNewTeacherName(e.target.value)}
                 required
                 className="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
               <button type="submit" className="w-full py-2 bg-orange-600 text-white font-bold text-xs rounded-xl hover:bg-orange-700">
-                Fanni Ro'yxatga Qo'shish
+                Fanni röyxatga qöşiş
               </button>
             </form>
 
@@ -287,7 +284,7 @@ export default function Collaboration() {
                 />
               </div>
               <button type="submit" className="w-full py-2 bg-orange-600 text-white font-bold text-xs rounded-xl hover:bg-orange-700">
-                Videodarsni Joylash
+                Videodarsni Joylaş
               </button>
             </form>
           </div>
@@ -301,12 +298,12 @@ export default function Collaboration() {
                 onChange={(e) => setSchedDay(e.target.value)}
                 className="px-3 py-2 bg-gray-50 border rounded-xl text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none"
               >
-                <option value="Dushanba">Dushanba</option>
-                <option value="Seshanba">Seshanba</option>
-                <option value="Chorshanba">Chorshanba</option>
-                <option value="Payshanba">Payshanba</option>
+                <option value="Dushanba">Duşanba</option>
+                <option value="Seshanba">Seşanba</option>
+                <option value="Chorshanba">Çorşanba</option>
+                <option value="Payshanba">Payşanba</option>
                 <option value="Juma">Juma</option>
-                <option value="Shanba">Shanba</option>
+                <option value="Shanba">Şanba</option>
               </select>
 
               <input
@@ -320,7 +317,7 @@ export default function Collaboration() {
 
               <input
                 type="text"
-                placeholder="Fanlar ro'yxati (masalan: Matematika, Fizika...)"
+                placeholder="Fanlar röyxati (masalan: Matematika, Fizika...)"
                 value={schedSubjects}
                 onChange={(e) => setSchedSubjects(e.target.value)}
                 required
@@ -328,13 +325,13 @@ export default function Collaboration() {
               />
             </div>
             <button type="submit" className="w-full py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl hover:bg-emerald-700">
-              Jadvalni E'lon Qilish
+              Jadvalni e'lon qiliş
             </button>
           </form>
         </div>
       )}
 
-      {/* Tab Almashish Tugmalari (Kurslar va Dars Jadvali) */}
+      {/* Tab Almashish Tugmalari */}
       <div className="flex gap-4 mb-8">
         <button
           onClick={() => setActiveTab('courses')}
@@ -342,7 +339,7 @@ export default function Collaboration() {
             activeTab === 'courses' ? 'bg-orange-600 text-white shadow-orange-500/30' : 'bg-white text-gray-700 hover:bg-gray-100'
           }`}
         >
-          📚 Fanlar va O'quv Kurslari
+          📚 Fanlar va öquv kurslari
         </button>
         <button
           onClick={() => setActiveTab('schedule')}
@@ -357,7 +354,6 @@ export default function Collaboration() {
       {/* 1-TAB: FANLAR VA KURSLAR */}
       {activeTab === 'courses' && (
         <div>
-          {/* Fanlar menyusi */}
           <div className="flex flex-wrap gap-3 mb-8">
             {Object.keys(subjectsData).map((sub) => (
               <button
@@ -374,21 +370,18 @@ export default function Collaboration() {
             ))}
           </div>
 
-          {/* Tanlangan fan ma'lumotlari */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {/* Videodarslar */}
             <div className="lg:col-span-2 bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 mb-1">{selectedSubject} fani bo'yicha kurslar</h2>
-              <p className="text-sm text-orange-600 font-semibold mb-6">O'qituvchi: {currentData.teacher}</p>
+              <p className="text-sm text-orange-600 font-semibold mb-6">Öqituvçi: {currentData.teacher}</p>
               
               <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span>📹</span> Videodarslar ro'yxati
+                <span>📹</span> Videodarslar röyxati
               </h3>
               
               {currentData.videos.length === 0 ? (
                 <div className="p-6 bg-gray-50 rounded-2xl text-center text-gray-500 text-sm">
-                  Ushbu fan bo'yicha hali videodarslar joylanmagan.
+                  Uşbu fan böyiça hali videodarslar joylanmagan.
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -399,7 +392,7 @@ export default function Collaboration() {
                         <span className="text-xs text-gray-500">Davomiyligi: {vid.duration}</span>
                       </div>
                       <a href={vid.link} target="_blank" rel="noreferrer" className="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-xl hover:bg-orange-700 transition">
-                        Ko'rish ➔
+                        Köriş ➔
                       </a>
                     </div>
                   ))}
@@ -407,10 +400,9 @@ export default function Collaboration() {
               )}
             </div>
 
-            {/* Onlayn Testlar */}
             <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-200">
               <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span>📝</span> Onlayn Testlar
+                <span>📝</span> Onlayn testlar
               </h3>
               {currentData.tests.length === 0 ? (
                 <div className="p-6 bg-gray-50 rounded-2xl text-center text-gray-500 text-sm">
@@ -424,7 +416,7 @@ export default function Collaboration() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-500">{test.questions} ta savol</span>
                         <button onClick={() => alert('Test tez orada ishga tushadi!')} className="px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition">
-                          Testni boshlash
+                          Testni boşlaş
                         </button>
                       </div>
                     </div>
@@ -432,7 +424,6 @@ export default function Collaboration() {
                 </div>
               )}
             </div>
-
           </div>
         </div>
       )}

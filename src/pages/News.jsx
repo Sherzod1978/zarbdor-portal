@@ -55,16 +55,17 @@ export default function News() {
     }
   };
 
-  const handleAdminLogin = (e) => {
-    e.preventDefault();
-    if (adminPass === 'admin2026') {
-      setIsAdmin(true);
-      setShowAdminLogin(false);
-      setAdminPass('');
-    } else {
-      alert('Admin paroli xato!');
-    }
-  };
+  const handleLogin = (e) => {
+  e.preventDefault();
+  // Вместо 'admin2026' укажите свой новый надежный пароль
+  if (password === 'Zarbdor@2026') { 
+    setIsAdmin(true);
+    setShowLoginModal(false);
+    setPassword('');
+  } else {
+    alert("Parol noto'g'ri!");
+  }
+};
 
   const handleAddNews = (e) => {
     e.preventDefault();
