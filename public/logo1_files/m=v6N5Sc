@@ -1,0 +1,7 @@
+"use strict";loaded_g_0(function(_){var window=this;
+_.q("v6N5Sc");
+var m0f=class extends _.h{constructor(a){super(a)}getId(){return _.x(this,1)}aa(){return _.x(this,2)}getAction(){return _.uk(this,3)}};var n0f=_.jf(class extends _.h{constructor(a){super(a)}});var p0f=class extends _.mw{constructor(a){super(a.ga,{ha:new Set([1,2,4,5])});this.response=a}ba(){var a=this.aa().fa,b=_.rr(a,2),c=_.x(a,1),d=_.vq(a,m0f,3);_.sk(a,4);var e=_.x(a,5);_.x(a,6);var f=_.x(a,7),g=_.x(a,8),k=_.iw(this,0,"div"),l=_.ty(_.cB,k);this.onInit(function(){var m=l();if(b.length>0){let n=new Map,p=!!f,t=_.Dib&&!!g,u=!!e&&b.length===1;if(p||t||u)for(let v of b)n.set(v,Object.assign({},p||t?{snippet:p?f:void 0,claim:t?g:void 0}:{},u?{url:e}:{}));_.TA(m,c,b,n.size>0?n:void 0)}if(d.length>
+0)for(let n of d)n.getAction()===2?m.Xa.set(n.getId(),""):n.getAction()===1&&m.Xa.set(n.getId(),n.aa())})}aa(){return super.aa()}da(){return o0f}};p0f.prototype.$wa$p2ggSe=function(){return this.da};p0f.prototype.$wa$QyQmSc=function(){return this.aa};p0f.prototype.$wa$kXCA5e=function(){return this.ba};var o0f=[["fa",n0f()]];_.V(_.r("v6N5Sc#ZMgAbe","v6N5Sc",[_.W]),p0f);
+_.N();
+});
+// Google Inc.
