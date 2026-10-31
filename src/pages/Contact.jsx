@@ -10,15 +10,53 @@ export default function Contact({ currentSeason }) {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  // TELEGRAM BOT SOZLAMALARI
+  // O'zingizning Bot Token va Chat ID raqamlaringizni quyidagi qobitlar ichiga yozing:
+  const TELEGRAM_BOT_TOKEN = '9038809843:AAGOCnTgQMtxqoO0RfTKZ01hNGhi0DGZodc'; 
+  const TELEGRAM_CHAT_ID = '1024073475';
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
+    // Telegram botga yuboriladigan matn strukturasi
+    const textMessage = `
+📩 *Yangi murojaat (Zarbdor IM Portali)*
+
+👤 *F.I.Sh:* ${formData.name}
+📞 *Tel:* ${formData.phone}
+📧 *Email:* ${formData.email || "Körsatilmadi"}
+📌 *Mavzu:* ${formData.subject}
+
+📝 *Xabar matni:*
+${formData.message}
+    `;
+
+    try {
+      // Agar Token kiritilgan bo'lsa Telegram API ga so'rov yuborish
+      if (TELEGRAM_BOT_TOKEN !== '9038809843:AAGOCnTgQMtxqoO0RfTKZ01hNGhi0DGZodc') {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: textMessage,
+            parse_mode: 'Markdown'
+          })
+        });
+      }
+
+      setSubmitted(true);
       setFormData({ name: '', phone: '', email: '', subject: 'Taklif / Murojaat', message: '' });
-    }, 4000);
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch (error) {
+      alert("Xabar yuborişda xatolik yuz berdi!");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -43,10 +81,10 @@ export default function Contact({ currentSeason }) {
             <div>
               <h3 className="font-bold text-gray-900 text-lg">Telefon aloqasi</h3>
               <p className="text-xs text-gray-500 mb-2">Duşanba - Şanba (08:00 - 17:00)</p>
-              <a href="tel:+998721234567" className="text-orange-600 font-bold hover:underline block text-sm">
+              <a href="tel:+998943422221" className="text-orange-600 font-bold hover:underline block text-sm">
                 +998 (94) 342-22-21
               </a>
-              <a href="tel:+998901234567" className="text-gray-700 font-semibold hover:underline block text-sm mt-1">
+              <a href="tel:+998956337878" className="text-gray-700 font-semibold hover:underline block text-sm mt-1">
                 +998 (95) 633-78-78 (Admin)
               </a>
             </div>
@@ -63,7 +101,7 @@ export default function Contact({ currentSeason }) {
               <a href="mailto:info@zarbdorim.uz" className="text-blue-600 font-bold hover:underline block text-sm">
                 info@zarbdorim.uz
               </a>
-              <a href="mailto:admin@zarbdorim.uz" className="text-gray-700 font-semibold hover:underline block text-sm mt-1">
+              <a href="mailto:sherzod3191178@gmail.com" className="text-gray-700 font-semibold hover:underline block text-sm mt-1">
                 sherzod3191178@gmail.com
               </a>
             </div>
@@ -97,7 +135,7 @@ export default function Contact({ currentSeason }) {
 
           {submitted && (
             <div className="mb-6 p-4 bg-emerald-100 border border-emerald-400 text-emerald-800 rounded-2xl text-sm font-bold flex items-center gap-2 animate-bounce">
-              <span>✅</span> Murojaatingiz muvaffaqiyatli yuborildi! Admin tez orada siz bilan boğlanadi.
+              <span>✅</span> Murojaatingiz Telegram orqali muvaffaqiyatli yuborildi! Admin tez orada siz bilan boğlanadi.
             </div>
           )}
 
@@ -169,9 +207,10 @@ export default function Contact({ currentSeason }) {
 
             <button
               type="submit"
-              className="w-full py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg shadow-orange-500/30 transition duration-300"
+              disabled={loading}
+              className="w-full py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg shadow-orange-500/30 transition duration-300 disabled:opacity-50"
             >
-              🚀 Murojaatni yuboriş
+              {loading ? "🚀 Yuborilmoqda..." : "🚀 Murojaatni yuboriş"}
             </button>
           </form>
         </div>
