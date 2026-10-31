@@ -21,38 +21,41 @@ export default function Contact({ currentSeason }) {
     e.preventDefault();
     setLoading(true);
 
-    // Telegram botga yuboriladigan matn strukturasi
-    const textMessage = `
-📩 *Yangi murojaat (Zarbdor IM Portali)*
+    // Oddiy matn ko'rinishi (hech qanday maxsus belgilarsiz)
+    const textMessage = `Yangi murojaat (Zarbdor IM Portali)
 
-👤 *F.I.Sh:* ${formData.name}
-📞 *Tel:* ${formData.phone}
-📧 *Email:* ${formData.email || "Körsatilmadi"}
-📌 *Mavzu:* ${formData.subject}
+F.I.Sh: ${formData.name}
+Tel: ${formData.phone}
+Email: ${formData.email || "Ko'rsatilmadi"}
+Mavzu: ${formData.subject}
 
-📝 *Xabar matni:*
-${formData.message}
-    `;
+Xabar matni:
+${formData.message}`;
 
     try {
-      // Agar Token kiritilgan bo'lsa Telegram API ga so'rov yuborish
-      if (TELEGRAM_BOT_TOKEN !== '9038809843:AAGOCnTgQMtxqoO0RfTKZ01hNGhi0DGZodc') {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      if (TELEGRAM_BOT_TOKEN) {
+        const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chat_id: TELEGRAM_CHAT_ID,
-            text: textMessage,
-            parse_mode: 'Markdown'
+            text: textMessage
+            // parse_mode olib tashlandi, shuning uchun xato bermaydi
           })
         });
+        
+        const data = await response.json();
+        if (!data.ok) {
+          console.error("Telegram xatosi:", data);
+          alert("Telegramga yuborishda xatolik: " + data.description);
+        }
       }
 
       setSubmitted(true);
       setFormData({ name: '', phone: '', email: '', subject: 'Taklif / Murojaat', message: '' });
       setTimeout(() => setSubmitted(false), 5000);
     } catch (error) {
-      alert("Xabar yuborişda xatolik yuz berdi!");
+      alert("Xabar yuborishda xatolik yuz berdi!");
       console.error(error);
     } finally {
       setLoading(false);
