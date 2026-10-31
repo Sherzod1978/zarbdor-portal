@@ -8,7 +8,7 @@ export default function Collaboration() {
     { id: 3, day: 'Çorşanba', classNum: '10-B', subjects: 'Matematika (Algebra), Ona tili, Fizika, Geometriya' }
   ];
 
-  // Dastlabki fanlar va ularning darslari
+  // Dastlabki fanlar, darslar va testlar
   const initialSubjects = {
     Matematika: {
       teacher: "K. Mamadiyorov (Oliy toifali öqituvçi)",
@@ -17,7 +17,23 @@ export default function Collaboration() {
         { title: '2-mavzu: Integrallar va yuzlarni hisoblaş', duration: '50 min', link: '#' }
       ],
       tests: [
-        { title: '1-bosqiç test nazorati (15 ta savol)', questions: 15 }
+        { 
+          id: 101,
+          title: '1-bosqiç test nazorati', 
+          duration: 10, // daqiqa
+          shuffle: true,
+          questions: [
+            {
+              id: 1,
+              question: "2 + 2 * 2 ifodaning qiymatini toping:",
+              options: ["6", "8", "4", "2"],
+              correct: 0,
+              points: 10,
+              timer: 30,
+              explanation: "Matematik qoidaga ko'ra avval ko'paytirish bajariladi: 2 * 2 = 4, keyin qo'shiladi: 2 + 4 = 6."
+            }
+          ]
+        }
       ]
     },
     Informatika: {
@@ -27,7 +43,32 @@ export default function Collaboration() {
         { title: 'LEGO EV3 Pybricks MicroPython asoslari', duration: '40 min', link: '#' }
       ],
       tests: [
-        { title: 'Python asoslari böyiça test', questions: 20 }
+        { 
+          id: 102,
+          title: "Python asoslari böyiça test", 
+          duration: 15, 
+          shuffle: false,
+          questions: [
+            {
+              id: 1,
+              question: "Python dasturlash tilida ekranga matn chiqarish uchun qaysi funksiya ishlatiladi?",
+              options: ["print()", "echo()", "cout <<", "Console.WriteLine()"],
+              correct: 0,
+              points: 10,
+              timer: 30,
+              explanation: "Python-da ekranga ma'lumot chiqarish uchun print() funksiyasi qo'llaniladi."
+            },
+            {
+              id: 2,
+              question: "Quyidagilardan qaysi biri o'zgaruvchi nomi bo'la olmaydi?",
+              options: ["my_var", "_variable", "123var", "var123"],
+              correct: 2,
+              points: 10,
+              timer: 30,
+              explanation: "O'zgaruvchi nomlari raqam bilan boshlanishi taqiqlangan."
+            }
+          ]
+        }
       ]
     }
   };
@@ -48,8 +89,10 @@ export default function Collaboration() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [adminPass, setAdminPass] = useState('');
 
+  // Navigatsiya va Tablar ('courses', 'schedule', 'take-test', 'result', 'test-admin')
+  const [activeTab, setActiveTab] = useState('courses'); 
+
   // Admin formalari uchun state-lar
-  const [activeTab, setActiveTab] = useState('courses'); // 'courses' yoki 'schedule'
   const [newSubjectName, setNewSubjectName] = useState('');
   const [newTeacherName, setNewTeacherName] = useState('');
   
@@ -63,6 +106,32 @@ export default function Collaboration() {
   const [schedClass, setSchedClass] = useState('9-A');
   const [schedSubjects, setSchedSubjects] = useState('');
 
+  // Test ishlash jarayoni state-lari
+  const [activeTest, setActiveTest] = useState(null);
+  const [studentInfo, setStudentInfo] = useState({ name: '', className: '' });
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [studentAnswers, setStudentAnswers] = useState({});
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [testResult, setTestResult] = useState(null);
+  const [submissions, setSubmissions] = useState(() => {
+    const saved = localStorage.getItem('test_submissions');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Yangi test yaratish state-lari (Admin uchun)
+  const [newTestTitle, setNewTestTitle] = useState('');
+  const [newTestDuration, setNewTestDuration] = useState(15);
+  const [newTestShuffle, setNewTestShuffle] = useState(false);
+  
+  // Yangi savol qo'shish state-lari
+  const [questionText, setQuestionText] = useState('');
+  const [options, setOptions] = useState(['', '', '', '']);
+  const [correctOption, setCorrectOption] = useState(0);
+  const [questionPoints, setQuestionPoints] = useState(10);
+  const [questionTimer, setQuestionTimer] = useState(30);
+  const [questionExplanation, setQuestionExplanation] = useState('');
+  const [tempQuestions, setTempQuestions] = useState([]);
+
   useEffect(() => {
     localStorage.setItem('school_subjects', JSON.stringify(subjectsData));
   }, [subjectsData]);
@@ -70,6 +139,23 @@ export default function Collaboration() {
   useEffect(() => {
     localStorage.setItem('school_schedules', JSON.stringify(schedules));
   }, [schedules]);
+
+  useEffect(() => {
+    localStorage.setItem('test_submissions', JSON.stringify(submissions));
+  }, [submissions]);
+
+  // Savol uchun taymer
+  useEffect(() => {
+    let timer;
+    if (activeTab === 'take-test' && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && activeTab === 'take-test') {
+      handleNextQuestion();
+    }
+    return () => clearInterval(timer);
+  }, [timeLeft, activeTab]);
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
@@ -135,7 +221,6 @@ export default function Collaboration() {
     alert("Videodars muvaffaqiyatli qöşildi!");
   };
 
-  // Videoni o'chirish funksiyasi
   const handleDeleteVideo = (subjectName, videoIndex) => {
     if (window.confirm("Ushbu videoni o'chirmoqchimisiz?")) {
       const sub = subjectsData[subjectName];
@@ -168,11 +253,131 @@ export default function Collaboration() {
     alert("Dars jadvali muvaffaqiyatli saqlandi!");
   };
 
-  // Dars jadvalini o'chirish
   const handleDeleteSchedule = (id) => {
     if (window.confirm("Uşbu dars jadvalini öchirmoqçimisiz?")) {
       setSchedules(schedules.filter(item => item.id !== id));
     }
+  };
+
+  // Testni boshlash
+  const startTest = (test) => {
+    if (!studentInfo.name || !studentInfo.className) {
+      alert("Iltimos, avval ism-familiyangiz va sinfingizni kiriting!");
+      setActiveTab('courses');
+      return;
+    }
+    let testQuestions = [...test.questions];
+    if (test.shuffle) {
+      testQuestions = testQuestions.sort(() => Math.random() - 0.5);
+    }
+    setActiveTest({ ...test, questions: testQuestions });
+    setCurrentQuestionIndex(0);
+    setStudentAnswers({});
+    setTimeLeft(testQuestions[0]?.timer || 30);
+    setActiveTab('take-test');
+  };
+
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < activeTest.questions.length - 1) {
+      const nextIdx = currentQuestionIndex + 1;
+      setCurrentQuestionIndex(nextIdx);
+      setTimeLeft(activeTest.questions[nextIdx].timer || 30);
+    } else {
+      finishTest();
+    }
+  };
+
+  const finishTest = () => {
+    let totalScore = 0;
+    let maxScore = 0;
+    let correctCount = 0;
+    let incorrectCount = 0;
+
+    activeTest.questions.forEach((q, idx) => {
+      maxScore += q.points;
+      if (studentAnswers[idx] === q.correct) {
+        totalScore += q.points;
+        correctCount++;
+      } else {
+        incorrectCount++;
+      }
+    });
+
+    const percentage = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
+    let grade = "Qoniqarsiz";
+    if (percentage >= 85) grade = "A'lo (5)";
+    else if (percentage >= 70) grade = "Yaxshi (4)";
+    else if (percentage >= 50) grade = "Qoniqarli (3)";
+
+    const resultData = {
+      student: studentInfo,
+      testTitle: activeTest.title,
+      totalScore,
+      maxScore,
+      percentage,
+      grade,
+      correctCount,
+      incorrectCount,
+      date: new Date().toLocaleString()
+    };
+
+    setTestResult(resultData);
+    setSubmissions([resultData, ...submissions]);
+    setActiveTab('result');
+  };
+
+  // Admin uchun savol qo'shish va test saqlash
+  const handleAddTempQuestion = (e) => {
+    e.preventDefault();
+    if (!questionText || options.some(opt => !opt)) {
+      alert("Savol matni va barcha 4 ta variantni to'ldiring!");
+      return;
+    }
+
+    const newQ = {
+      id: Date.now(),
+      question: questionText,
+      options: [...options],
+      correct: Number(correctOption),
+      points: Number(questionPoints),
+      timer: Number(questionTimer),
+      explanation: questionExplanation
+    };
+
+    setTempQuestions([...tempQuestions, newQ]);
+    setQuestionText('');
+    setOptions(['', '', '', '']);
+    setQuestionExplanation('');
+    alert("Savol vaqtincha qo'shildi. Testni saqlash uchun 'Testni To'liq Saqlash' tugmasini bosing.");
+  };
+
+  const handleSaveNewTest = () => {
+    if (!newTestTitle || tempQuestions.length === 0) {
+      alert("Test sarlavhasini kiriting va kamida 1 ta savol qo'shing!");
+      return;
+    }
+
+    const newTestObj = {
+      id: Date.now(),
+      title: newTestTitle,
+      duration: Number(newTestDuration),
+      shuffle: newTestShuffle,
+      questions: tempQuestions
+    };
+
+    const currentSub = subjectsData[selectedSubject];
+    const updated = {
+      ...subjectsData,
+      [selectedSubject]: {
+        ...currentSub,
+        tests: [...currentSub.tests, newTestObj]
+      }
+    };
+
+    setSubjectsData(updated);
+    setNewTestTitle('');
+    setTempQuestions([]);
+    alert("Yangi test muvaffaqiyatli yaratildi va fanga qo'shildi!");
   };
 
   const currentData = subjectsData[selectedSubject] || { teacher: '', videos: [], tests: [] };
@@ -187,21 +392,32 @@ export default function Collaboration() {
           <p className="text-gray-600">Maktab bazasidagi maxsus öquv kurslari, dars jadvallari, videodarslar va testlar markazi.</p>
         </div>
 
-        {!isAdmin ? (
-          <button 
-            onClick={() => setShowAdminLogin(true)}
-            className="px-5 py-2.5 bg-gray-900 text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition shadow-md"
-          >
-            ⚙️ Admin boşqaruvi
-          </button>
-        ) : (
-          <button 
-            onClick={() => setIsAdmin(false)}
-            className="px-5 py-2.5 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 transition shadow-md"
-          >
-            🚪 Admin rejimidan çiqiş
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {isAdmin && (
+            <button 
+              onClick={() => setActiveTab('test-admin')}
+              className="px-4 py-2.5 bg-orange-600 text-white font-bold rounded-xl text-sm hover:bg-orange-700 transition shadow-md"
+            >
+              📝 Testlar va Natijalar (Admin)
+            </button>
+          )}
+
+          {!isAdmin ? (
+            <button 
+              onClick={() => setShowAdminLogin(true)}
+              className="px-5 py-2.5 bg-gray-900 text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition shadow-md"
+            >
+              ⚙️ Admin boşqaruvi
+            </button>
+          ) : (
+            <button 
+              onClick={() => { setIsAdmin(false); setActiveTab('courses'); }}
+              className="px-5 py-2.5 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 transition shadow-md"
+            >
+              🚪 Admin rejimidan çiqiş
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Admin Login Modali */}
@@ -212,12 +428,11 @@ export default function Collaboration() {
             <form onSubmit={handleAdminLogin}>
               <input 
                 type="password"
-                placeholder="Admin parolini kiriting..."
+                placeholder="Admin parolini kiriting (admin2026)..."
                 value={adminPass}
                 onChange={(e) => setAdminPass(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
               />
-
               <div className="flex justify-end gap-3">
                 <button 
                   type="button" 
@@ -238,8 +453,8 @@ export default function Collaboration() {
         </div>
       )}
 
-      {/* Admin Panel */}
-      {isAdmin && (
+      {/* Admin Panel (LMS va Dars Jadvali Boshqaruvi) */}
+      {isAdmin && activeTab !== 'test-admin' && (
         <div className="bg-orange-50 border-2 border-orange-200 p-6 rounded-3xl mb-10 shadow-lg space-y-6">
           <h2 className="text-xl font-black text-orange-900 flex items-center gap-2">
             <span>🛠</span> LMS va dars jadvalini boshqarish (Admin Panel)
@@ -347,24 +562,26 @@ export default function Collaboration() {
       )}
 
       {/* Tab Almashish Tugmalari */}
-      <div className="flex gap-4 mb-8">
-        <button
-          onClick={() => setActiveTab('courses')}
-          className={`px-6 py-3 rounded-2xl font-bold transition-all shadow-md text-sm ${
-            activeTab === 'courses' ? 'bg-orange-600 text-white shadow-orange-500/30' : 'bg-white text-gray-700 hover:bg-gray-100'
-          }`}
-        >
-          📚 Fanlar va öquv kurslari
-        </button>
-        <button
-          onClick={() => setActiveTab('schedule')}
-          className={`px-6 py-3 rounded-2xl font-bold transition-all shadow-md text-sm ${
-            activeTab === 'schedule' ? 'bg-orange-600 text-white shadow-orange-500/30' : 'bg-white text-gray-700 hover:bg-gray-100'
-          }`}
-        >
-          📅 Maktab Dars Jadvali
-        </button>
-      </div>
+      {activeTab !== 'take-test' && activeTab !== 'result' && activeTab !== 'test-admin' && (
+        <div className="flex gap-4 mb-8">
+          <button
+            onClick={() => setActiveTab('courses')}
+            className={`px-6 py-3 rounded-2xl font-bold transition-all shadow-md text-sm ${
+              activeTab === 'courses' ? 'bg-orange-600 text-white shadow-orange-500/30' : 'bg-white text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            📚 Fanlar va öquv kurslari
+          </button>
+          <button
+            onClick={() => setActiveTab('schedule')}
+            className={`px-6 py-3 rounded-2xl font-bold transition-all shadow-md text-sm ${
+              activeTab === 'schedule' ? 'bg-orange-600 text-white shadow-orange-500/30' : 'bg-white text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            📅 Maktab Dars Jadvali
+          </button>
+        </div>
+      )}
 
       {/* 1-TAB: FANLAR VA KURSLAR */}
       {activeTab === 'courses' && (
@@ -386,114 +603,89 @@ export default function Collaboration() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">{selectedSubject} fani bo'yicha kurslar</h2>
-              <p className="text-sm text-orange-600 font-semibold mb-6">Öqituvçi: {currentData.teacher}</p>
-              
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <span>📹</span> Videodarslar röyxati
-              </h3>
-              
-              {currentData.videos.length === 0 ? (
-                <div className="p-6 bg-gray-50 rounded-2xl text-center text-gray-500 text-sm">
-                  Uşbu fan böyiça hali videodarslar joylanmagan.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {currentData.videos.map((vid, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-orange-50 transition">
-                      <div>
-                        <h4 className="font-bold text-gray-900">{vid.title}</h4>
-                        <span className="text-xs text-gray-500">Davomiyligi: {vid.duration}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <a href={vid.link} target="_blank" rel="noreferrer" className="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-xl hover:bg-orange-700 transition">
-                          Köriş ➔
-                        </a>
-                        {isAdmin && (
-                          <button
-                            onClick={() => handleDeleteVideo(selectedSubject, idx)}
-                            className="px-3 py-2 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition"
-                            title="Videoni o'chirish"
-                          >
-                            🗑
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span>📝</span> Onlayn testlar
-              </h3>
-              {currentData.tests.length === 0 ? (
-                <div className="p-6 bg-gray-50 rounded-2xl text-center text-gray-500 text-sm">
-                  Testlar mavjud emas.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {currentData.tests.map((test, idx) => (
-                    <div key={idx} className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                      <h4 className="font-bold text-gray-900 text-sm mb-2">{test.title}</h4>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500">{test.questions} ta savol</span>
-                        <button onClick={() => alert('Test tez orada ishga tushadi!')} className="px-3 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition">
-                          Testni boşlaş
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 2-TAB: DARS JADVALI */}
-      {activeTab === 'schedule' && (
-        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <span>📅</span> Maktab haftalik dars jadvali
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {schedules.map((item) => (
-              <div key={item.id} className="p-6 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col justify-between shadow-sm">
-                <div>
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="px-3 py-1 bg-orange-100 text-orange-700 text-xs font-black rounded-full">
-                      {item.day}
-                    </span>
-                    <span className="font-black text-gray-900 text-lg">
-                      {item.classNum} sinf
-                    </span>
+            <div className="lg:col-span-2 bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-200 space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">{selectedSubject} fani bo'yicha kurslar</h2>
+                <p className="text-sm text-orange-600 font-semibold mb-6">Öqituvçi: {currentData.teacher}</p>
+                
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <span>📹</span> Videodarslar röyxati
+                </h3>
+                
+                {currentData.videos.length === 0 ? (
+                  <div className="p-6 bg-gray-50 rounded-2xl text-center text-gray-500 text-sm">
+                    Uşbu fan böyiça hali videodarslar joylanmagan.
                   </div>
-                  <p className="text-sm text-gray-700 leading-relaxed font-semibold">
-                    {item.subjects}
-                  </p>
-                </div>
-
-                {isAdmin && (
-                  <div className="mt-4 pt-3 border-t border-gray-200 text-right">
-                    <button
-                      onClick={() => handleDeleteSchedule(item.id)}
-                      className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700"
-                    >
-                      🗑 Jadvalni öçiriş
-                    </button>
+                ) : (
+                  <div className="space-y-4">
+                    {currentData.videos.map((vid, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-orange-50 transition">
+                        <div>
+                          <h4 className="font-bold text-gray-900">{vid.title}</h4>
+                          <span className="text-xs text-gray-500">Davomiyligi: {vid.duration}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <a href={vid.link} target="_blank" rel="noreferrer" className="px-4 py-2 bg-orange-600 text-white text-xs font-bold rounded-xl hover:bg-orange-700 transition">
+                            Köriş ➔
+                          </a>
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleDeleteVideo(selectedSubject, idx)}
+                              className="px-3 py-2 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition"
+                            >
+                              🗑
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </div>
 
-    </div>
-  );
-}
+            {/* Testlar paneli va o'quvchi ma'lumotlarini kiritish */}
+            <div className="space-y-6">
+              <div className="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-gray-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">✍️ Test topshirish uchun kirish</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Ism va Familiyangiz</label>
+                    <input 
+                      type="text" 
+                      placeholder="Masalan: Sherzod Amanov"
+                      value={studentInfo.name}
+                      onChange={(e) => setStudentInfo({ ...studentInfo, name: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Sinfingiz</label>
+                    <input 
+                      type="text" 
+                      placeholder="Masalan: 9-A"
+                      value={studentInfo.className}
+                      onChange={(e) => setStudentInfo({ ...studentInfo, className: e.target.value })}
+                      className="w-full px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span>📝</span> {selectedSubject} — Onlayn testlar
+                </h3>
+                {currentData.tests.length === 0 ? (
+                  <div className="p-6 bg-gray-50 rounded-2xl text-center text-gray-500 text-sm">
+                    Hozircha bu fandan testlar mavjud emas.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {currentData.tests.map((test) => (
+                      <div key={test.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col justify-between">
+                        <div>
+                          <h4 className="font-bold text-gray-900 text-sm mb-1">{test.title}</h4>
+                          <span className="text-xs text-gray-500 block mb-3">Savollar soni: {test.questions.length} ta | Vaqt: {test.duration} min</span>
+                        </div>
+                        <button
