@@ -49,7 +49,7 @@ export default function App() {
       name: 'Kuz', 
       bgGradient: 'from-amber-100 via-orange-100 to-amber-200', 
       accentColor: 'text-amber-950', 
-      particles: ['🍁','🍁'] 
+      particles: ['🍁'] 
     },
     winter: { 
       name: 'Qish', 
