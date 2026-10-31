@@ -123,7 +123,7 @@ export default function About({ currentSeason }) {
               className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-100 text-center hover:shadow-2xl transition-all duration-300 flex flex-col items-center mx-auto w-full max-w-md"
             >
               {person.image ? (
-                <div className="w-36 h-36 mb-6 rounded-full overflow-hidden shadow-lg border-4 border-orange-500 shrink-0">
+                <div className="w-36 h-36 mb-6 rounded-full overflow-hidden shrink-0">
                   <img src={person.image} alt={person.name} className="w-full h-full object-cover" />
                 </div>
               ) : (
