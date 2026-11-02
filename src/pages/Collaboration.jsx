@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 
 export default function Collaboration() {
   const initialSchedules = [
-    { id: 1, day: 'Dushanba', classNum: '9-A', subjects: 'Matematika, Fizika, Informatika, Ingliz tili' },
-    { id: 2, day: 'Seshanba', classNum: '9-A', subjects: 'Informatika (Robototexnika), Kimyo, Biologiya, Tarix' },
-    { id: 3, day: 'Chorshanba', classNum: '10-B', subjects: 'Matematika (Algebra), Ona tili, Fizika, Geometriya' }
+    { id: 1, day: 'Duşanba', classNum: '9-A', subjects: 'Matematika, Fizika, Informatika, Ingliz tili' },
+    { id: 2, day: 'Seşanba', classNum: '9-A', subjects: 'Informatika (Robototexnika), Kimyo, Biologiya, Tarix' },
+    { id: 3, day: 'Chorşanba', classNum: '10-B', subjects: 'Matematika (Algebra), Ona tili, Fizika, Geometriya' }
   ];
 
   const initialSubjects = {
@@ -95,7 +95,7 @@ export default function Collaboration() {
   const [videoDuration, setVideoDuration] = useState('');
   const [videoLink, setVideoLink] = useState('');
 
-  const [schedDay, setSchedDay] = useState('Dushanba');
+  const [schedDay, setSchedDay] = useState('Duşanba');
   const [schedClass, setSchedClass] = useState('9-A');
   const [schedSubjects, setSchedSubjects] = useState('');
 
@@ -110,6 +110,8 @@ export default function Collaboration() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  // Test yaratish va tahrirlash state-lari
+  const [editingTestId, setEditingTestId] = useState(null);
   const [newTestTitle, setNewTestTitle] = useState('');
   const [newTestDuration, setNewTestDuration] = useState(15);
   const [newTestShuffle, setNewTestShuffle] = useState(false);
@@ -332,36 +334,78 @@ export default function Collaboration() {
     setQuestionText('');
     setOptions(['', '', '', '']);
     setQuestionExplanation('');
-    alert("Savol vaqtincha qo'shildi. Testni saqlash uchun 'Testni To'liq Saqlash' tugmasini bosing.");
+    alert("Savol qo'shildi!");
   };
 
+  // Testni saqlash yoki yangilash
   const handleSaveNewTest = () => {
     if (!newTestTitle || tempQuestions.length === 0) {
       alert("Test sarlavhasini kiriting va kamida 1 ta savol qo'shing!");
       return;
     }
 
-    const newTestObj = {
-      id: Date.now(),
-      title: newTestTitle,
-      duration: Number(newTestDuration),
-      shuffle: newTestShuffle,
-      questions: tempQuestions
-    };
-
     const currentSub = subjectsData[selectedSubject];
+    let updatedTests = [...currentSub.tests];
+
+    if (editingTestId) {
+      // Mavjud testni yangilash
+      updatedTests = updatedTests.map(t => 
+        t.id === editingTestId 
+          ? { ...t, title: newTestTitle, duration: Number(newTestDuration), shuffle: newTestShuffle, questions: tempQuestions }
+          : t
+      );
+      alert("Test muvaffaqiyatli tahrirlandi!");
+    } else {
+      // Yangi test qo'shish
+      const newTestObj = {
+        id: Date.now(),
+        title: newTestTitle,
+        duration: Number(newTestDuration),
+        shuffle: newTestShuffle,
+        questions: tempQuestions
+      };
+      updatedTests.push(newTestObj);
+      alert("Yangi test muvaffaqiyatli yaratildi!");
+    }
+
     const updated = {
       ...subjectsData,
       [selectedSubject]: {
         ...currentSub,
-        tests: [...currentSub.tests, newTestObj]
+        tests: updatedTests
       }
     };
 
     setSubjectsData(updated);
     setNewTestTitle('');
     setTempQuestions([]);
-    alert("Yangi test muvaffaqiyatli yaratildi va fanga qo'shildi!");
+    setEditingTestId(null);
+  };
+
+  // Testni tahrirlash uchun formaga yuklash
+  const handleEditTest = (test) => {
+    setEditingTestId(test.id);
+    setNewTestTitle(test.title);
+    setNewTestDuration(test.duration);
+    setNewTestShuffle(test.shuffle);
+    setTempQuestions([...test.questions]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Testni o'chirish
+  const handleDeleteTest = (testId) => {
+    if (window.confirm("Haqiqatan ham ushbu testni o'chirmoqchimisiz?")) {
+      const currentSub = subjectsData[selectedSubject];
+      const updatedTests = currentSub.tests.filter(t => t.id !== testId);
+      const updated = {
+        ...subjectsData,
+        [selectedSubject]: {
+          ...currentSub,
+          tests: updatedTests
+        }
+      };
+      setSubjectsData(updated);
+    }
   };
 
   const currentData = subjectsData[selectedSubject] || { teacher: '', videos: [], tests: [] };
@@ -442,7 +486,6 @@ export default function Collaboration() {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
             <form onSubmit={handleAddSubject} className="bg-white p-5 rounded-2xl border border-orange-200 space-y-3">
               <h3 className="font-bold text-gray-900 text-sm">➕ Yangi Fan Qo'shish</h3>
               <input
@@ -493,7 +536,7 @@ export default function Collaboration() {
                 />
               </div>
               <button type="submit" className="w-full py-2 bg-orange-600 text-white font-bold text-xs rounded-xl hover:bg-orange-700">
-                Videodarsni Joylash
+                Videodarsni joylaş
               </button>
             </form>
           </div>
@@ -506,12 +549,12 @@ export default function Collaboration() {
                 onChange={(e) => setSchedDay(e.target.value)}
                 className="px-3 py-2 bg-gray-50 border rounded-xl text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none"
               >
-                <option value="Dushanba">Dushanba</option>
-                <option value="Seshanba">Seshanba</option>
-                <option value="Chorshanba">Chorshanba</option>
-                <option value="Payshanba">Payshanba</option>
+                <option value="Duşanba">Duşanba</option>
+                <option value="Seşanba">Seşanba</option>
+                <option value="Chorşanba">Chorşanba</option>
+                <option value="Payşanba">Payşanba</option>
                 <option value="Juma">Juma</option>
-                <option value="Shanba">Shanba</option>
+                <option value="Şanba">Şanba</option>
               </select>
 
               <input
@@ -663,12 +706,32 @@ export default function Collaboration() {
                           <h4 className="font-bold text-gray-900 text-sm mb-1">{test.title}</h4>
                           <span className="text-xs text-gray-500 block mb-3">Savollar soni: {test.questions.length} ta | Vaqt: {test.duration} min</span>
                         </div>
-                        <button 
-                          onClick={() => startTest(test)} 
-                          className="w-full py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm"
-                        >
-                          🚀 Testni boshlash
-                        </button>
+                        <div className="flex gap-2">
+                          <button 
+                            onClick={() => startTest(test)} 
+                            className="flex-1 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition shadow-sm"
+                          >
+                            🚀 Boshlash
+                          </button>
+                          {isAdmin && (
+                            <>
+                              <button 
+                                onClick={() => { setActiveTab('test-admin'); handleEditTest(test); }} 
+                                className="px-3 py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition"
+                                title="Tahrirlash"
+                              >
+                                ✏️
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteTest(test.id)} 
+                                className="px-3 py-2.5 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition"
+                                title="O'chirish"
+                              >
+                                🗑
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -814,7 +877,7 @@ export default function Collaboration() {
           <div className="flex justify-between items-center pb-4 border-b border-gray-200">
             <div>
               <h2 className="text-2xl font-black text-gray-900">⚙️ Testlarni Boshqarish va Yaratish</h2>
-              <p className="text-sm text-gray-600">O'qituvchilar uchun savollar qo'shish va natijalarni ko'rish paneli.</p>
+              <p className="text-sm text-gray-600">O'qituvchilar uchun savollar qo'shish, tahrirlash va natijalarni ko'rish paneli.</p>
             </div>
             <button 
               onClick={() => setActiveTab('courses')}
@@ -826,7 +889,9 @@ export default function Collaboration() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-gray-50 p-6 rounded-3xl border border-gray-200 space-y-4">
-              <h3 className="text-lg font-bold text-gray-900">➕ Yangi Test Tuzish</h3>
+              <h3 className="text-lg font-bold text-gray-900">
+                {editingTestId ? "✏️ Testni Tahrirlash" : "➕ Yangi Test Tuzish"}
+              </h3>
               
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">Fan tanlash</label>
@@ -935,7 +1000,7 @@ export default function Collaboration() {
 
                 <input 
                   type="text" 
-                  placeholder="To'g'ri javob uchun izoh (tushuntirish)"
+                  placeholder="Töğri javob uçun izoh (tuşuntiriş)"
                   value={questionExplanation}
                   onChange={(e) => setQuestionExplanation(e.target.value)}
                   className="w-full px-3 py-2 bg-white border rounded-xl text-xs"
@@ -946,23 +1011,34 @@ export default function Collaboration() {
                   onClick={handleAddTempQuestion}
                   className="w-full py-2 bg-gray-800 text-white font-bold text-xs rounded-xl hover:bg-gray-900 transition"
                 >
-                  + Savolni qo'shish
+                  + Savolni qöşiş
                 </button>
               </div>
 
-              <button 
-                type="button"
-                onClick={handleSaveNewTest}
-                className="w-full py-3 bg-orange-600 text-white font-bold text-sm rounded-xl hover:bg-orange-700 shadow-md transition mt-4"
-              >
-                💾 Testni To'liq Saqlash va E'lon Qilish
-              </button>
+              <div className="flex gap-2 mt-4">
+                <button 
+                  type="button"
+                  onClick={handleSaveNewTest}
+                  className="flex-1 py-3 bg-orange-600 text-white font-bold text-sm rounded-xl hover:bg-orange-700 shadow-md transition"
+                >
+                  {editingTestId ? "💾 Özgarişlarni saqlaş" : "💾 Testni saqlaş va e'lon qilish"}
+                </button>
+                {editingTestId && (
+                  <button 
+                    type="button"
+                    onClick={() => { setEditingTestId(null); setNewTestTitle(''); setTempQuestions([]); }}
+                    className="px-4 py-3 bg-gray-300 text-gray-800 font-bold text-sm rounded-xl hover:bg-gray-400 transition"
+                  >
+                    Bekor qiliş
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="bg-gray-50 p-6 rounded-3xl border border-gray-200">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">📊 O'quvchilar Natijalari Jurnali</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">📊 Öquvçilar natijalari Jurnali</h3>
               {submissions.length === 0 ? (
-                <p className="text-sm text-gray-500">Hozircha test topshirgan o'quvchilar yo'q.</p>
+                <p className="text-sm text-gray-500">Hozirça test topşirgan öquvçilar yöq.</p>
               ) : (
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
                   {submissions.map((sub, idx) => (
