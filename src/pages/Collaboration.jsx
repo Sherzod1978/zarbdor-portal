@@ -9,15 +9,15 @@ export default function Collaboration() {
 
   const initialSubjects = {
     Matematika: {
-      teacher: "K. Mamadiyorov (Oliy toifali o'qituvchi)",
+      teacher: "K. Mamadiyorov (Oliy toifali öqituvçi)",
       videos: [
         { title: '1-mavzu: Hosila va uning tatbiqi', duration: '45 min', link: '#' },
-        { title: '2-mavzu: Integrallar va yuzlarni hisoblash', duration: '50 min', link: '#' }
+        { title: '2-mavzu: Integrallar va yuzlarni hisoblaş', duration: '50 min', link: '#' }
       ],
       tests: [
         { 
           id: 101,
-          title: '1-bosqich test nazorati', 
+          title: '1-bosqiç test nazorati', 
           duration: 10,
           shuffle: true,
           questions: [
@@ -28,7 +28,7 @@ export default function Collaboration() {
               correct: 0,
               points: 10,
               timer: 30,
-              explanation: "Matematik qoidaga ko'ra avval ko'paytirish bajariladi: 2 * 2 = 4, keyin qo'shiladi: 2 + 4 = 6."
+              explanation: "Matematik qoidaga köra avval köpaytiriş bajariladi: 2 * 2 = 4, keyin qo'shiladi: 2 + 4 = 6."
             }
           ]
         }
@@ -37,33 +37,33 @@ export default function Collaboration() {
     Informatika: {
       teacher: 'Sh. Amanov (IT mutaxassisi)',
       videos: [
-        { title: 'Python dasturlash tiliga kirish', duration: '60 min', link: '#' },
+        { title: 'Python dasturlaş tiliga kiriş', duration: '60 min', link: '#' },
         { title: 'LEGO EV3 Pybricks MicroPython asoslari', duration: '40 min', link: '#' }
       ],
       tests: [
         { 
           id: 102,
-          title: "Python asoslari bo'yicha test", 
+          title: "Python asoslari böyiça test", 
           duration: 15, 
           shuffle: false,
           questions: [
             {
               id: 1,
-              question: "Python dasturlash tilida ekranga matn chiqarish uchun qaysi funksiya ishlatiladi?",
+              question: "Python dasturlaş tilida ekranga matn çiqariş uçun qaysi funksiya işlatiladi?",
               options: ["print()", "echo()", "cout <<", "Console.WriteLine()"],
               correct: 0,
               points: 10,
               timer: 30,
-              explanation: "Python-da ekranga ma'lumot chiqarish uchun print() funksiyasi qo'llaniladi."
+              explanation: "Python-da ekranga ma'lumot çiqariş uçun print() funksiyasi qöllaniladi."
             },
             {
               id: 2,
-              question: "Quyidagilardan qaysi biri o'zgaruvchi nomi bo'la olmaydi?",
+              question: "Quyidagilardan qaysi biri özgaruvchi nomi böla olmaydi?",
               options: ["my_var", "_variable", "123var", "var123"],
               correct: 2,
               points: 10,
               timer: 30,
-              explanation: "O'zgaruvchi nomlari raqam bilan boshlanishi taqiqlangan."
+              explanation: "Özgaruvçi nomlari raqam bilan boşlanişi taqiqlangan."
             }
           ]
         }
@@ -316,7 +316,7 @@ export default function Collaboration() {
   const handleAddTempQuestion = (e) => {
     e.preventDefault();
     if (!questionText || options.some(opt => !opt)) {
-      alert("Savol matni va barcha 4 ta variantni to'ldiring!");
+      alert("Savol matni va barça 4 ta variantni töldiring!");
       return;
     }
 
@@ -334,13 +334,13 @@ export default function Collaboration() {
     setQuestionText('');
     setOptions(['', '', '', '']);
     setQuestionExplanation('');
-    alert("Savol qo'shildi!");
+    alert("Savol qöşildi!");
   };
 
   // Testni saqlash yoki yangilash
   const handleSaveNewTest = () => {
     if (!newTestTitle || tempQuestions.length === 0) {
-      alert("Test sarlavhasini kiriting va kamida 1 ta savol qo'shing!");
+      alert("Test sarlavhasini kiriting va kamida 1 ta savol qöshing!");
       return;
     }
 
@@ -394,7 +394,7 @@ export default function Collaboration() {
 
   // Testni o'chirish
   const handleDeleteTest = (testId) => {
-    if (window.confirm("Haqiqatan ham ushbu testni o'chirmoqchimisiz?")) {
+    if (window.confirm("Haqiqatan ham uşbu testni öçirmoqçimisiz?")) {
       const currentSub = subjectsData[selectedSubject];
       const updatedTests = currentSub.tests.filter(t => t.id !== testId);
       const updated = {
@@ -415,8 +415,8 @@ export default function Collaboration() {
       
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-gray-200 mb-8 flex flex-wrap justify-between items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">🎓 O'qituvchi va o'quvchilar hamkorligi</h1>
-          <p className="text-gray-600">Maktab bazasidagi maxsus o'quv kurslari, dars jadvallari, videodarslar va testlar markazi.</p>
+          <h1 className="text-3xl font-black text-gray-900 mb-2">🎓 Öqituvçi va öquvçilar hamkorligi</h1>
+          <p className="text-gray-600">Maktab bazasidagi maxsus öquv kurslari, dars jadvallari, videodarslar va testlar markazi.</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -434,14 +434,14 @@ export default function Collaboration() {
               onClick={() => setShowAdminLogin(true)}
               className="px-5 py-2.5 bg-gray-900 text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition shadow-md"
             >
-              ⚙️ Admin boshqaruvi
+              ⚙️ Admin boşqaruvi
             </button>
           ) : (
             <button 
               onClick={() => { setIsAdmin(false); setActiveTab('courses'); }}
               className="px-5 py-2.5 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 transition shadow-md"
             >
-              🚪 Admin rejimidan chiqish
+              🚪 Admin rejimidan çiqiş
             </button>
           )}
         </div>
@@ -450,7 +450,7 @@ export default function Collaboration() {
       {showAdminLogin && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin tizimiga kirish</h3>
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin tizimiga kiriş</h3>
             <form onSubmit={handleAdminLogin}>
               <input 
                 type="password"
@@ -465,13 +465,13 @@ export default function Collaboration() {
                   onClick={() => setShowAdminLogin(false)}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium"
                 >
-                  Bekor qilish
+                  Bekor qiliş
                 </button>
                 <button 
                   type="submit" 
                   className="px-5 py-2 bg-orange-600 text-white rounded-xl hover:bg-orange-500 transition font-bold"
                 >
-                  Kirish
+                  Kiriş
                 </button>
               </div>
             </form>
@@ -482,12 +482,12 @@ export default function Collaboration() {
       {isAdmin && activeTab !== 'test-admin' && (
         <div className="bg-orange-50 border-2 border-orange-200 p-6 rounded-3xl mb-10 shadow-lg space-y-6">
           <h2 className="text-xl font-black text-orange-900 flex items-center gap-2">
-            <span>🛠</span> LMS va dars jadvalini boshqarish (Admin Panel)
+            <span>🛠</span> LMS va dars jadvalini boşqariş (Admin Panel)
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <form onSubmit={handleAddSubject} className="bg-white p-5 rounded-2xl border border-orange-200 space-y-3">
-              <h3 className="font-bold text-gray-900 text-sm">➕ Yangi Fan Qo'shish</h3>
+              <h3 className="font-bold text-gray-900 text-sm">➕ Yangi fan qöşiş</h3>
               <input
                 type="text"
                 placeholder="Fan nomi (masalan: Kimyo)"
@@ -498,14 +498,14 @@ export default function Collaboration() {
               />
               <input
                 type="text"
-                placeholder="O'qituvchi F.I.Sh."
+                placeholder="Öqituvçi F.I.Ş."
                 value={newTeacherName}
                 onChange={(e) => setNewTeacherName(e.target.value)}
                 required
                 className="w-full px-3 py-2 bg-gray-50 border rounded-xl text-xs focus:ring-2 focus:ring-orange-500 focus:outline-none"
               />
               <button type="submit" className="w-full py-2 bg-orange-600 text-white font-bold text-xs rounded-xl hover:bg-orange-700">
-                Fanni ro'yxatga qo'shish
+                Fanni röyxatga qöşiş
               </button>
             </form>
 
@@ -847,18 +847,20 @@ export default function Collaboration() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
               <span className="text-xs text-gray-500 block">Umumiy ball</span>
-              <span className="text-2xl font-black text-gray-900">{testResult.totalScore} / {testResult.maxScore}</span>
+              <span className="text-2xl font-black text-gray-900">
+  {Number(testResult.totalScore).toFixed(1)} / {testResult.maxScore}
+</span>
             </div>
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
-              <span className="text-xs text-gray-500 block">Foiz ko'rsatkichi</span>
+              <span className="text-xs text-gray-500 block">Foiz körsatkiçi</span>
               <span className="text-2xl font-black text-orange-600">{testResult.percentage}%</span>
             </div>
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
-              <span className="text-xs text-gray-500 block">To'g'ri / Xato</span>
+              <span className="text-xs text-gray-500 block">Töğri / Xato</span>
               <span className="text-xl font-bold text-emerald-600">{testResult.correctCount}</span> / <span className="text-xl font-bold text-rose-600">{testResult.incorrectCount}</span>
             </div>
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
-              <span className="text-xs text-gray-500 block">Bahokorlik</span>
+              <span className="text-xs text-gray-500 block">Baho</span>
               <span className="text-lg font-black text-blue-600">{testResult.grade}</span>
             </div>
           </div>
@@ -867,7 +869,7 @@ export default function Collaboration() {
             onClick={() => setActiveTab('courses')}
             className="px-8 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg transition"
           >
-            ← Bosh sahifaga qaytish
+            ← Boş sahifaga qaytiş
           </button>
         </div>
       )}
@@ -876,21 +878,21 @@ export default function Collaboration() {
         <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-200 space-y-10">
           <div className="flex justify-between items-center pb-4 border-b border-gray-200">
             <div>
-              <h2 className="text-2xl font-black text-gray-900">⚙️ Testlarni Boshqarish va Yaratish</h2>
-              <p className="text-sm text-gray-600">O'qituvchilar uchun savollar qo'shish, tahrirlash va natijalarni ko'rish paneli.</p>
+              <h2 className="text-2xl font-black text-gray-900">⚙️ Testlarni boşqarish va yaratish</h2>
+              <p className="text-sm text-gray-600">Öqituvçilar uçun savollar qöşiş, tahrirlaş va natijalarni köriş paneli.</p>
             </div>
             <button 
               onClick={() => setActiveTab('courses')}
               className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl text-xs transition"
             >
-              ← Ortga qaytish
+              ← Ortga qaytiş
             </button>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-gray-50 p-6 rounded-3xl border border-gray-200 space-y-4">
               <h3 className="text-lg font-bold text-gray-900">
-                {editingTestId ? "✏️ Testni Tahrirlash" : "➕ Yangi Test Tuzish"}
+                {editingTestId ? "✏️ Testni tahrirlaş" : "➕ Yangi test tuziş"}
               </h3>
               
               <div>
@@ -905,7 +907,7 @@ export default function Collaboration() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Test Nomi</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">Test nomi</label>
                 <input 
                   type="text" 
                   placeholder="Masalan: Ma'lumotlar bazasi asoslari"
@@ -933,13 +935,13 @@ export default function Collaboration() {
                       onChange={(e) => setNewTestShuffle(e.target.checked)}
                       className="w-4 h-4 text-orange-600 rounded"
                     />
-                    Savollarni almashtirish (Shuffle)
+                    Savollarni almaştiriş (Shuffle)
                   </label>
                 </div>
               </div>
 
               <div className="pt-4 border-t border-gray-200 space-y-3">
-                <h4 className="font-bold text-sm text-gray-800">Testga savol qo'shish (Hozircha: {tempQuestions.length} ta)</h4>
+                <h4 className="font-bold text-sm text-gray-800">Testga savol qöşiş (Hozircha: {tempQuestions.length} ta)</h4>
                 
                 <input 
                   type="text" 
