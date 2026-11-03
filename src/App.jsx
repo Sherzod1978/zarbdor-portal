@@ -118,13 +118,11 @@ export default function App() {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md border-b border-gray-200 px-6 py-4">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-6">
           
-          {/* Logo (Oq fonda ko'k logo uchun bg-white va p-1 qo'shildi) */}
-          <Link to="/" className="flex items-center space-x-3 shrink-0 group">
-            <img 
-  src="/logo.png" 
-  alt="Zarbdor IM Logo" 
-  className="h-10 w-10 object-contain bg-white p-1 rounded-xl shadow-md border border-gray-200 transition-transform group-hover:scale-105" 
-/>
+          <img 
+          src="/logo.png" 
+          alt="Zarbdor IM Logo" 
+          className="h-10 w-auto object-contain" 
+          />
             <span className={`text-2xl font-black ${current.accentColor}`}>Zarbdor IM</span>
           </Link>
 
