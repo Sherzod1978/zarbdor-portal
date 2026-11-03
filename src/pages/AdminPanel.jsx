@@ -1,24 +1,15 @@
+import { db } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import React, { useState, useEffect } from 'react';
 
 export default function AdminPanel({ onBackToSite }) {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [adminPass, setAdminPass] = useState('');
   
-  // Ma'lumotlar state-lari
-  const [subjectsData, setSubjectsData] = useState(() => {
-    const saved = localStorage.getItem('school_subjects');
-    return saved ? JSON.parse(saved) : {};
-  });
-
-  const [schedules, setSchedules] = useState(() => {
-    const saved = localStorage.getItem('school_schedules');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [submissions, setSubmissions] = useState(() => {
-    const saved = localStorage.getItem('test_submissions');
-    return saved ? JSON.parse(saved) : [];
-  });
+  // Ma'lumotlar state-lari (Firebase'dan o'qiladi)
+  const [subjectsData, setSubjectsData] = useState({});
+  const [schedules, setSchedules] = useState([]);
+  const [submissions, setSubmissions] = useState([]);
 
   const [activeSection, setActiveSection] = useState('tests'); // 'tests', 'schedules', 'submissions'
 
@@ -37,13 +28,38 @@ export default function AdminPanel({ onBackToSite }) {
   const [tempQuestions, setTempQuestions] = useState([]);
   const [editingTestId, setEditingTestId] = useState(null);
 
+  // 1. Sahifa ochilganda Firebase'dan ma'lumotlarni yuklab olish
   useEffect(() => {
-    localStorage.setItem('school_subjects', JSON.stringify(subjectsData));
-  }, [subjectsData]);
+    const fetchFirebaseData = async () => {
+      try {
+        const docRef = doc(db, "portal", "schoolData");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.subjects) setSubjectsData(data.subjects);
+          if (data.schedules) setSchedules(data.schedules);
+          if (data.submissions) setSubmissions(data.submissions);
+        }
+      } catch (err) {
+        console.error("Firebase'dan ma'lumot olishda xatolik:", err);
+      }
+    };
+    fetchFirebaseData();
+  }, []);
 
-  useEffect(() => {
-    localStorage.setItem('school_schedules', JSON.stringify(schedules));
-  }, [schedules]);
+  // 2. Ma'lumotlarni Firebase'ga saqlash funksiyasi
+  const saveToFirebase = async (updatedSubjects, updatedSchedules, updatedSubmissions) => {
+    try {
+      await setDoc(doc(db, "portal", "schoolData"), { 
+        subjects: updatedSubjects,
+        schedules: updatedSchedules,
+        submissions: updatedSubmissions
+      });
+      console.log("Firebase'ga muvaffaqiyatli saqlandi!");
+    } catch (err) {
+      console.error("Firebase'ga saqlashda xatolik:", err);
+    }
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -58,7 +74,7 @@ export default function AdminPanel({ onBackToSite }) {
   const handleAddTempQuestion = (e) => {
     e.preventDefault();
     if (!questionText || options.some(opt => !opt)) {
-      alert("Savol matni va barcha 4 ta variantni töldiring!");
+      alert("Savol matni va barcha 4 ta variantni to'ldiring!");
       return;
     }
 
@@ -86,7 +102,7 @@ export default function AdminPanel({ onBackToSite }) {
     }
 
     const currentSub = subjectsData[selectedSubject] || { teacher: "O'qituvchi", videos: [], tests: [] };
-    let updatedTests = [...currentSub.tests];
+    let updatedTests = [...(currentSub.tests || [])];
 
     if (editingTestId) {
       updatedTests = updatedTests.map(t => 
@@ -107,7 +123,7 @@ export default function AdminPanel({ onBackToSite }) {
       alert("Yangi test yaratildi!");
     }
 
-    const updated = {
+    const updatedSubjects = {
       ...subjectsData,
       [selectedSubject]: {
         ...currentSub,
@@ -115,7 +131,9 @@ export default function AdminPanel({ onBackToSite }) {
       }
     };
 
-    setSubjectsData(updated);
+    setSubjectsData(updatedSubjects);
+    saveToFirebase(updatedSubjects, schedules, submissions);
+
     setNewTestTitle('');
     setTempQuestions([]);
     setEditingTestId(null);
@@ -130,13 +148,15 @@ export default function AdminPanel({ onBackToSite }) {
   };
 
   const handleDeleteTest = (testId) => {
-    if (window.confirm("Testni öchirmoqchimisiz?")) {
+    if (window.confirm("Testni o'chirmoqchimisiz?")) {
       const currentSub = subjectsData[selectedSubject];
       const updatedTests = currentSub.tests.filter(t => t.id !== testId);
-      setSubjectsData({
+      const updatedSubjects = {
         ...subjectsData,
         [selectedSubject]: { ...currentSub, tests: updatedTests }
-      });
+      };
+      setSubjectsData(updatedSubjects);
+      saveToFirebase(updatedSubjects, schedules, submissions);
     }
   };
 
@@ -152,7 +172,7 @@ export default function AdminPanel({ onBackToSite }) {
           <form onSubmit={handleLogin} className="space-y-4">
             <input 
               type="password"
-              placeholder="Admin parolini kiriting (admin2026)..."
+              placeholder="Admin parolini kiriting..."
               value={adminPass}
               onChange={(e) => setAdminPass(e.target.value)}
               className="w-full p-4 bg-gray-50 border border-gray-300 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -184,21 +204,21 @@ export default function AdminPanel({ onBackToSite }) {
         {/* Top Header */}
         <div className="bg-white rounded-3xl p-6 shadow-lg border border-gray-200 flex flex-wrap justify-between items-center gap-4">
           <div>
-            <h1 className="text-2xl font-black text-gray-900">⚙️ Admin Böşqaruv Paneli</h1>
-            <p className="text-xs text-gray-500">Subdomain: admin.zarbdor-im.uz (Standart Workspace)</p>
+            <h1 className="text-2xl font-black text-gray-900">⚙️ Admin boshqaruv paneli</h1>
+            <p className="text-xs text-gray-500">Subdomain: admin.zarbdor-im.uz (Firebase Cloud Connected)</p>
           </div>
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsAdminLoggedIn(false)}
               className="px-4 py-2.5 bg-red-100 text-red-600 font-bold rounded-xl text-xs hover:bg-red-200 transition"
             >
-              Çıqiş
+              Chiqish
             </button>
             <button 
               onClick={onBackToSite}
               className="px-4 py-2.5 bg-gray-900 text-white font-bold rounded-xl text-xs hover:bg-gray-800 transition"
             >
-              Saytni körish ↗
+              Saytni ko'rish ↗
             </button>
           </div>
         </div>
@@ -211,7 +231,7 @@ export default function AdminPanel({ onBackToSite }) {
               activeSection === 'tests' ? 'bg-orange-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
-            📝 Testlarni Böşqarish
+            📝 Testlarni boshqarish
           </button>
           <button
             onClick={() => setActiveSection('submissions')}
@@ -219,7 +239,7 @@ export default function AdminPanel({ onBackToSite }) {
               activeSection === 'submissions' ? 'bg-orange-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
             }`}
           >
-            📊 Öquvçilar Natijalari ({submissions.length})
+            📊 O'quvchilar natijalari ({submissions.length})
           </button>
         </div>
 
@@ -229,7 +249,7 @@ export default function AdminPanel({ onBackToSite }) {
             {/* Test Tuzish Formasi */}
             <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200 space-y-5">
               <h3 className="text-lg font-black text-gray-900">
-                {editingTestId ? "✏️ Testni Tahrirlash" : "➕ Yangi Test Qöşiş"}
+                {editingTestId ? "✏️ Testni Tahrirlash" : "➕ Yangi test qo'shish"}
               </h3>
 
               <div>
@@ -239,7 +259,11 @@ export default function AdminPanel({ onBackToSite }) {
                   onChange={(e) => setSelectedSubject(e.target.value)}
                   className="w-full p-3 bg-gray-50 border rounded-xl text-sm"
                 >
-                  {Object.keys(subjectsData).map(sub => <option key={sub} value={sub}>{sub}</option>)}
+                  {Object.keys(subjectsData).length > 0 ? (
+                    Object.keys(subjectsData).map(sub => <option key={sub} value={sub}>{sub}</option>)
+                  ) : (
+                    <option value="Informatika">Informatika</option>
+                  )}
                 </select>
               </div>
 
@@ -272,13 +296,13 @@ export default function AdminPanel({ onBackToSite }) {
                       onChange={(e) => setNewTestShuffle(e.target.checked)}
                       className="w-4 h-4 text-orange-600 rounded"
                     />
-                    Savollarni araläştiriş
+                    Savolarni aralashtirish
                   </label>
                 </div>
               </div>
 
               <div className="pt-4 border-t space-y-3">
-                <h4 className="font-bold text-xs text-gray-800">Savol qöşiş (Jami: {tempQuestions.length} ta)</h4>
+                <h4 className="font-bold text-xs text-gray-800">Savol qo'shish (Jami: {tempQuestions.length} ta)</h4>
                 
                 <input 
                   type="text" 
@@ -307,7 +331,7 @@ export default function AdminPanel({ onBackToSite }) {
 
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="block text-[10px] font-bold text-gray-600">Tög'ri (0-3)</label>
+                    <label className="block text-[10px] font-bold text-gray-600">To'g'ri (0-3)</label>
                     <input type="number" min="0" max="3" value={correctOption} onChange={(e) => setCorrectOption(e.target.value)} className="w-full p-2.5 border rounded-xl text-xs" />
                   </div>
                   <div>
@@ -322,7 +346,7 @@ export default function AdminPanel({ onBackToSite }) {
 
                 <input 
                   type="text" 
-                  placeholder="Izoh (tüşuntiriş)"
+                  placeholder="Izoh (tushuntirish)"
                   value={questionExplanation}
                   onChange={(e) => setQuestionExplanation(e.target.value)}
                   className="w-full p-2.5 bg-gray-50 border rounded-xl text-xs"
@@ -333,7 +357,7 @@ export default function AdminPanel({ onBackToSite }) {
                   onClick={handleAddTempQuestion}
                   className="w-full py-2.5 bg-gray-900 text-white font-bold text-xs rounded-xl hover:bg-gray-800"
                 >
-                  + Savolni röyxatga qöşiş
+                  + Savolni ro'yxatga qo'shish
                 </button>
               </div>
 
@@ -342,11 +366,11 @@ export default function AdminPanel({ onBackToSite }) {
                 onClick={handleSaveNewTest}
                 className="w-full py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold text-sm rounded-xl shadow-lg transition"
               >
-                💾 Testni Töliq Saqläş
+                💾 Testni To'liq Saqlash
               </button>
             </div>
 
-            {/* Mavjud Testlar röyxati */}
+            {/* Mavjud Testlar ro'yxati */}
             <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200 space-y-4">
               <h3 className="text-lg font-black text-gray-900">📚 Mavjud Testlar</h3>
               
@@ -375,9 +399,9 @@ export default function AdminPanel({ onBackToSite }) {
 
         {activeSection === 'submissions' && (
           <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200 space-y-6">
-            <h3 className="text-lg font-black text-gray-900">📊 Öquvçilar Natijalari Jurnali</h3>
+            <h3 className="text-lg font-black text-gray-900">📊 O'quvchilar Natijalari Jurnali</h3>
             {submissions.length === 0 ? (
-              <p className="text-sm text-gray-500">Hozircha test topşirganlar yöq.</p>
+              <p className="text-sm text-gray-500">Hozircha test topshirganlar yo'q.</p>
             ) : (
               <div className="space-y-3">
                 {submissions.map((sub, idx) => (
