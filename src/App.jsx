@@ -9,7 +9,7 @@ import Collaboration from './pages/Collaboration';
 import Achievements from './pages/Achievements';
 import Graduates from './pages/Graduates';
 import Contact from './pages/Contact';
-import AdminPanel from './pages/AdminPanel'; // 1. AdminPanel import qilindi
+import AdminPanel from './pages/AdminPanel';
 
 export default function App() {
   const [season, setSeason] = useState('autumn');
@@ -117,7 +117,6 @@ export default function App() {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md border-b border-gray-200 px-6 py-4">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-6">
           
-          {/* Logo va Nomi to'g'rilandi */}
           <Link to="/" className="flex items-center gap-3">
             <img 
               src="/logo.png" 
@@ -202,7 +201,7 @@ export default function App() {
           <Route path="/collaboration" element={<Collaboration />} />
           <Route path="/graduates" element={<Graduates currentSeason={current} />} />
           
-          {/* 2. Admin Panel uchun Route qo'shildi */}
+          {/* Admin panel faqat yashirin /admin manzili orqali ishlaydi */}
           <Route path="/admin" element={<AdminPanel onBackToSite={() => window.location.href = '/'} />} />
         </Routes>
       </main>
@@ -263,12 +262,6 @@ export default function App() {
               <li>
                 <Link to="/contact" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
                   Boğlaniş
-                </Link>
-              </li>
-              {/* Footerga Admin panelga tezkor havola */}
-              <li className="pt-2">
-                <Link to="/admin" className="text-orange-400 hover:text-orange-300 hover:underline transition font-bold">
-                  ⚙️ Admin panel
                 </Link>
               </li>
             </ul>
