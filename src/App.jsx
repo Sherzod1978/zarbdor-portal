@@ -1,4 +1,3 @@
-import Contact from './pages/Contact';
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import Home from './pages/Home';
@@ -9,6 +8,8 @@ import Login from './pages/Login';
 import Collaboration from './pages/Collaboration';
 import Achievements from './pages/Achievements';
 import Graduates from './pages/Graduates';
+import Contact from './pages/Contact';
+import AdminPanel from './pages/AdminPanel'; // 1. AdminPanel import qilindi
 
 export default function App() {
   const [season, setSeason] = useState('autumn');
@@ -33,12 +34,12 @@ export default function App() {
     const interval = setInterval(() => {
       const newSparkle = {
         id: Date.now(),
-        top: Math.random() * 85 + 5, // Ekrandagi balandlik (5% - 90%)
-        left: Math.random() * 90 + 5, // Ekrandagi eni (5% - 95%)
+        top: Math.random() * 85 + 5,
+        left: Math.random() * 90 + 5,
         scale: Math.random() * 0.8 + 0.8,
       };
 
-      setRandomSparkles((prev) => [...prev.slice(-8), newSparkle]); // Bir vaqtning o'zida ko'pi bilan 8 ta yulduz tursin
+      setRandomSparkles((prev) => [...prev.slice(-8), newSparkle]);
     }, 1200);
 
     return () => clearInterval(interval);
@@ -79,7 +80,6 @@ export default function App() {
       {/* Dynamic Seasonal Effects */}
       <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden">
         {season === 'summer' ? (
-          // Yoz uchun tasodifiy yonib-o'chuvchi yulduzchalar
           randomSparkles.map((item) => (
             <span
               key={item.id}
@@ -94,7 +94,6 @@ export default function App() {
             </span>
           ))
         ) : (
-          // Boshqa mavsumlar uchun tushuvchi elementlar
           current.particles.map((item, index) => (
             <span
               key={index}
@@ -118,11 +117,13 @@ export default function App() {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-md border-b border-gray-200 px-6 py-4">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-6">
           
-          <img 
-          src="/logo.png" 
-          alt="Zarbdor IM Logo" 
-          className="h-10 w-auto object-contain" 
-          />
+          {/* Logo va Nomi to'g'rilandi */}
+          <Link to="/" className="flex items-center gap-3">
+            <img 
+              src="/logo.png" 
+              alt="Zarbdor IM Logo" 
+              className="h-10 w-auto object-contain bg-transparent" 
+            />
             <span className={`text-2xl font-black ${current.accentColor}`}>Zarbdor IM</span>
           </Link>
 
@@ -141,7 +142,6 @@ export default function App() {
           {/* Menyu Navigatsiyasi */}
           <nav className="flex items-center space-x-6 text-base font-bold shrink-0">
             
-            {/* Boş sahifa Dropdown */}
             <div className="relative group py-2">
               <Link to="/" className="hover:text-orange-600 transition flex items-center gap-1">
                 Boş sahifa ▾
@@ -156,7 +156,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Maktab haqida Dropdown (Bitiruvçilar shu yerga qo'shildi) */}
             <div className="relative group py-2">
               <Link to="/about" className="hover:text-orange-600 transition flex items-center gap-1">
                 Maktab haqida ▾
@@ -202,6 +201,9 @@ export default function App() {
           <Route path="/login" element={<Login currentSeason={current} />} />
           <Route path="/collaboration" element={<Collaboration />} />
           <Route path="/graduates" element={<Graduates currentSeason={current} />} />
+          
+          {/* 2. Admin Panel uchun Route qo'shildi */}
+          <Route path="/admin" element={<AdminPanel onBackToSite={() => window.location.href = '/'} />} />
         </Routes>
       </main>
 
@@ -261,6 +263,12 @@ export default function App() {
               <li>
                 <Link to="/contact" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
                   Boğlaniş
+                </Link>
+              </li>
+              {/* Footerga Admin panelga tezkor havola */}
+              <li className="pt-2">
+                <Link to="/admin" className="text-orange-400 hover:text-orange-300 hover:underline transition font-bold">
+                  ⚙️ Admin panel
                 </Link>
               </li>
             </ul>
