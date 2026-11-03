@@ -11,21 +11,26 @@ export default function App() {
   }
 
   return (
-    <div>
-      {/* Admin panelga o'tish uchun kichik tugma (yuqori qismda) */}
-      <div className="bg-gray-900 text-white text-xs py-2 px-6 flex justify-between items-center">
-        <span>Zarbdor IM Rasmiy Portali</span>
+    <div className="min-h-screen bg-gray-50">
+      {/* Yuqori navigatsiya va admin panelga o'tish tugmasi */}
+      <header className="bg-gray-900 text-white px-6 py-3 flex justify-between items-center shadow-md">
+        <div className="flex items-center gap-2">
+          <span className="text-orange-500 font-bold">🏫 Zarbdor IM</span>
+          <span className="text-xs text-gray-400">Rasmiy portali</span>
+        </div>
         <button 
           onClick={() => setCurrentView('admin')}
-          className="text-orange-400 font-bold hover:underline"
+          className="px-4 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-xl transition shadow"
         >
-          ⚙️ Admin Panelga o'tish
+          ⚙️ Admin panelga ötiş
         </button>
-      </div>
+      </header>
 
-      {/* Asosiy sahifalar */}
-      <Collaboration />
-      <Contact />
+      {/* Asosiy sahifa tarkibi */}
+      <main>
+        <Collaboration />
+        <Contact />
+      </main>
     </div>
   );
 }
