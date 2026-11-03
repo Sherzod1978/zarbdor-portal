@@ -462,7 +462,7 @@ export default function Collaboration() {
             <form onSubmit={handleAdminLogin}>
               <input 
                 type="password"
-                placeholder="Admin parolini kiriting (admin2026)..."
+                placeholder="Admin parolini kiriting ..."
                 value={adminPass}
                 onChange={(e) => setAdminPass(e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -997,7 +997,7 @@ export default function Collaboration() {
           <div className="space-y-4 pt-4 border-t">
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                📊 Öquvçilar natijalari Jurnali
+                📊 Öquvçilar natijalari jurnali
               </h3>
               {submissions.length > 0 && (
                 <button
