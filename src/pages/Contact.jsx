@@ -25,7 +25,7 @@ export default function Contact({ currentSeason }) {
 
 F.I.Sh: ${formData.name}
 Tel: ${formData.phone}
-Telegram: ${formData.telegram ? '@' + formData.telegram.replace('@', '') : "Ko'rsatilmadi"}
+Telegram: ${formData.telegram ? '@' + formData.telegram.replace('@', '') : "Kösatilmadi"}
 Email: ${formData.email || "Körsatilmadi"}
 Mavzu: ${formData.subject}
 

@@ -242,7 +242,7 @@ export default function Collaboration() {
   };
 
   const handleDeleteSchedule = (id) => {
-    if (window.confirm("Ushbu dars jadvalini o'chirmoqchimisiz?")) {
+    if (window.confirm("Uşbu dars jadvalini öçirmoqçimisiz?")) {
       setSchedules(schedules.filter(item => item.id !== id));
     }
   };
@@ -293,7 +293,7 @@ export default function Collaboration() {
     const percentage = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
     let grade = "Qoniqarsiz";
     if (percentage >= 85) grade = "A'lo (5)";
-    else if (percentage >= 70) grade = "Yaxshi (4)";
+    else if (percentage >= 70) grade = "Yaxşi (4)";
     else if (percentage >= 50) grade = "Qoniqarli (3)";
 
     const resultData = {
@@ -340,7 +340,7 @@ export default function Collaboration() {
   // Testni saqlash yoki yangilash
   const handleSaveNewTest = () => {
     if (!newTestTitle || tempQuestions.length === 0) {
-      alert("Test sarlavhasini kiriting va kamida 1 ta savol qöshing!");
+      alert("Test sarlavhasini kiriting va kamida 1 ta savol qöşing!");
       return;
     }
 
@@ -428,7 +428,20 @@ export default function Collaboration() {
               📝 Testlar va Natijalar (Admin)
             </button>
           )}
+// Birorta o'quvchining natijasini o'chirish
+  const handleDeleteSubmission = (indexToDelete) => {
+    if (window.confirm("Ushbu o'quvchi natijasini haqiqatan ham o'chirmoqchimisiz?")) {
+      const updatedSubmissions = submissions.filter((_, index) => index !== indexToDelete);
+      setSubmissions(updatedSubmissions);
+    }
+  };
 
+  // Barcha natijalarni tozalash (Ixtiyoriy)
+  const handleClearAllSubmissions = () => {
+    if (window.confirm("Barça öquvçilar natijalarini tozalab taşlamoqçimisiz?")) {
+      setSubmissions([]);
+    }
+  };
           {!isAdmin ? (
             <button 
               onClick={() => setShowAdminLogin(true)}
