@@ -121,10 +121,10 @@ export default function App() {
           {/* Logo (Oq fonda ko'k logo uchun bg-white va p-1 qo'shildi) */}
           <Link to="/" className="flex items-center space-x-3 shrink-0 group">
             <img 
-              src="/logo.jpg" 
-              alt="Zarbdor IM Logo" 
-              className="h-10 w-10 object-contain bg-white p-1 rounded-xl shadow-md border border-gray-200 transition-transform group-hover:scale-105" 
-            />
+  src="/logo.png" 
+  alt="Zarbdor IM Logo" 
+  className="h-10 w-10 object-contain bg-white p-1 rounded-xl shadow-md border border-gray-200 transition-transform group-hover:scale-105" 
+/>
             <span className={`text-2xl font-black ${current.accentColor}`}>Zarbdor IM</span>
           </Link>
 
