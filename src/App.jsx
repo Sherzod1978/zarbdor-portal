@@ -22,7 +22,7 @@ export default function App() {
           onClick={() => setCurrentView('admin')}
           className="px-4 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-xl transition shadow"
         >
-          ⚙️ Admin panelga ötiş
+          ⚙️ Admin Panelga ötiş
         </button>
       </header>
 
