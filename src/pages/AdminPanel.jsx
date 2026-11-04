@@ -1,5 +1,5 @@
 import { db } from '../firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore'; // <-- onSnapshot qo'shildi
 import React, { useState, useEffect } from 'react';
 
 export default function AdminPanel({ onBackToSite }) {
