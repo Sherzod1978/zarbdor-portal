@@ -25,11 +25,11 @@ export default function Home({ current, searchQuery }) {
   const searchItems = [
     { title: "Maktab haqida va tariximiz", path: "/about", desc: "Zarbdor Ixtisoslaştirilgan Maktabi haqida batafsil ma'lumot." },
     { title: "Qabul şartlari va talablar", path: "/admission", desc: "Maktabga qabul jarayoni va imtihon talablari." },
-    { title: "Sönggi yangiliklar va e'lonlar", path: "/news", desc: "Maktab hayotidagi muhim yangiliklar." },
+    { title: "Sönggi yangiliklar va e'lonlar", path: "/news", desc: "Maktab hayotidagi muhim voqealari." },
     { title: "Bitiruvçilar va ularning yutuqlari", path: "/graduates", desc: "Muvaffaqiyatli bitiruvçilarimiz röyxati." },
-    { title: "öqituvçi va öquvçilar hamkorligi", path: "/login", desc: "Admin va öqituvçilar uchun boşqaruv paneli." },
-    { title: "Yutuqlar va olimpiada g'oliblari", path: "/achievements", desc: "öquvçilarimizning faxrli örinlari." },
-    { title: "Bog'laniş va manzil", path: "/contact", desc: "Biz bilan boğlaniş uchun telefon va manzil." }
+    { title: "Öqituvçi va öquvçilar hamkorligi", path: "/collaboration", desc: "Admin va öqituvçilar uchun boşqaruv paneli." },
+    { title: "Yutuqlar va olimpiada g'oliblari", path: "/achievements", desc: "Öquvçilarimizning faxrli örinlari." },
+    { title: "Boğlaniş va manzil", path: "/contact", desc: "Biz bilan boğlaniş uchun telefon va manzil." }
   ];
 
   const filteredItems = searchQuery 
@@ -94,7 +94,7 @@ export default function Home({ current, searchQuery }) {
                   to="/admission" 
                   className="px-9 py-4 text-xl font-extrabold text-white bg-white/20 hover:bg-white/30 border-2 border-white/50 rounded-2xl backdrop-blur-md shadow-xl hover:scale-105 transition-all duration-300"
                 >
-                  Qabul shartlari
+                  Qabul şartlari
                 </Link>
               </div>
             </div>
@@ -108,10 +108,10 @@ export default function Home({ current, searchQuery }) {
                 {Object.entries(subjectsData).map(([subName, subObj]) => (
                   <div key={subName} className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
                     <h3 className="text-xl font-bold text-orange-600 mb-2">{subName}</h3>
-                    <p className="text-xs text-gray-500 mb-4">öqituvçi: {subObj.teacher || "Mavjud emas"}</p>
+                    <p className="text-xs text-gray-500 mb-4">Öqituvçi: {subObj.teacher || "Mavjud emas"}</p>
                     <div className="space-y-2">
                       <span className="text-sm font-semibold text-gray-700 block">Testlar soni: {subObj.tests?.length || 0} ta</span>
-                      <Link to="/login" className="inline-block w-full text-center py-2 bg-orange-100 text-orange-700 font-bold rounded-xl text-xs hover:bg-orange-200 transition">
+                      <Link to="/collaboration" className="inline-block w-full text-center py-2 bg-orange-100 text-orange-700 font-bold rounded-xl text-xs hover:bg-orange-200 transition">
                         Test topşiriş ↗
                       </Link>
                     </div>
