@@ -28,12 +28,11 @@ export default function AdminPanel({ onBackToSite }) {
   const [tempQuestions, setTempQuestions] = useState([]);
   const [editingTestId, setEditingTestId] = useState(null);
 
-  // 1. Sahifa ochilganda Firebase'dan ma'lumotlarni yuklab olish
+  // 1. Firebase'dan ma'lumotlarni real vaqt rejimida (onSnapshot) o'qib olish
   useEffect(() => {
-    const fetchFirebaseData = async () => {
+    const docRef = doc(db, "portal", "schoolData");
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
       try {
-        const docRef = doc(db, "portal", "schoolData");
-        const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data.subjects) setSubjectsData(data.subjects);
@@ -41,10 +40,13 @@ export default function AdminPanel({ onBackToSite }) {
           if (data.submissions) setSubmissions(data.submissions);
         }
       } catch (err) {
-        console.error("Firebase'dan ma'lumot olishda xatolik:", err);
+        console.error("Firebase ma'lumotlarini o'qishda xatolik:", err);
       }
-    };
-    fetchFirebaseData();
+    }, (error) => {
+      console.error("Firestore onSnapshot xatoligi:", error);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   // 2. Ma'lumotlarni Firebase'ga saqlash funksiyasi
