@@ -1,32 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
 export default function Achievements() {
   const defaultPlaceholder = 'https://images.unsplash.com/photo-1579389083078-4e7018379f7e?auto=format&fit=crop&w=600&q=80';
 
-  const initialAchievements = [
-    {
-      id: 1,
-      studentName: 'Mamatqulov Temur',
-      title: 'Informatika fanidan Respublika Olimpiadasi 1-örin',
-      category: 'Olimpiada',
-      date: '2027-05-10',
-      image: defaultPlaceholder
-    },
-    {
-      id: 2,
-      studentName: 'Qarşıboyeva Mubına',
-      title: 'IELTS 9.0 Xalqaro tillar sertifikati',
-      category: 'Sertifikat',
-      date: '2027-08-15',
-      image: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80'
-    }
-  ];
-
-  const [achievements, setAchievements] = useState(() => {
-    const saved = localStorage.getItem('school_achievements');
-    return saved ? JSON.parse(saved) : initialAchievements;
-  });
-
+  const [achievements, setAchievements] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [adminPass, setAdminPass] = useState('');
@@ -36,9 +15,60 @@ export default function Achievements() {
   const [category, setCategory] = useState('Olimpiada');
   const [uploadedImage, setUploadedImage] = useState('');
 
+  // 1. Firebase'dan yutuqlarni real vaqt rejimida (onSnapshot) o'qib olish
   useEffect(() => {
-    localStorage.setItem('school_achievements', JSON.stringify(achievements));
-  }, [achievements]);
+    const docRef = doc(db, "portal", "schoolData");
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.achievements && data.achievements.length > 0) {
+          setAchievements(data.achievements);
+        } else {
+          // Boshlang'ich namunaviy yutuqlar
+          const initialAchievements = [
+            {
+              id: 1,
+              studentName: 'Mamatqulov Temur',
+              title: 'Informatika fanidan Respublika Olimpiadasi 1-o\'rin',
+              category: 'Olimpiada',
+              date: '2026-05-10',
+              image: defaultPlaceholder
+            },
+            {
+              id: 2,
+              studentName: 'Qarşıboyeva Mubına',
+              title: 'IELTS 9.0 Xalqaro tillar sertifikati',
+              category: 'Sertifikat',
+              date: '2026-08-15',
+              image: 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?auto=format&fit=crop&w=600&q=80'
+            }
+          ];
+          setAchievements(initialAchievements);
+        }
+      }
+    }, (error) => {
+      console.error("Firestore tinglashda xatolik:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // 2. Firebase'ga ma'lumotlarni saqlash funksiyasi
+  const saveToFirebase = async (updatedAchievements) => {
+    try {
+      const docRef = doc(db, "portal", "schoolData");
+      const docSnap = await getDoc(docRef);
+      const existingData = docSnap.exists() ? docSnap.data() : {};
+
+      await setDoc(docRef, {
+        ...existingData,
+        achievements: updatedAchievements
+      });
+      console.log("Yutuqlar Firebase'ga muvaffaqiyatli saqlandi!");
+    } catch (err) {
+      console.error("Firebase'ga saqlashda xatolik:", err);
+    }
+  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -80,7 +110,10 @@ export default function Achievements() {
       image: uploadedImage
     };
 
-    setAchievements([newItem, ...achievements]);
+    const updatedAchievements = [newItem, ...achievements];
+    setAchievements(updatedAchievements);
+    saveToFirebase(updatedAchievements); // <-- Firebase'ga saqlash
+
     setStudentName('');
     setTitle('');
     setUploadedImage('');
@@ -89,8 +122,10 @@ export default function Achievements() {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Haqiqatan ham uşbu sertifikatni öçirmoqçimisiz?')) {
-      setAchievements(achievements.filter(item => item.id !== id));
+    if (window.confirm('Haqiqatan ham ushbu sertifikatni o\'chirmoqchimisiz?')) {
+      const updatedAchievements = achievements.filter(item => item.id !== id);
+      setAchievements(updatedAchievements);
+      saveToFirebase(updatedAchievements); // <-- Firebase'ga saqlash
     }
   };
 
@@ -100,8 +135,8 @@ export default function Achievements() {
       {/* Sarlavha va Admin tugmasi */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-gray-200 mb-8 flex flex-wrap justify-between items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 mb-2">🏆 Öquvçilarimiz yutuqlari</h1>
-          <p className="text-gray-600">Maktabimiz öquvçilarining olimpiadalarda va xalqaro sertifikatlarda erishgan natijalari.</p>
+          <h1 className="text-3xl font-black text-gray-900 mb-2">🏆 O'quvchilarimiz yutuqlari</h1>
+          <p className="text-gray-600">Maktabimiz o'quvchilarining olimpiadalarda va xalqaro sertifikatlarda erishgan natijalari.</p>
         </div>
         
         {!isAdmin ? (
@@ -109,14 +144,14 @@ export default function Achievements() {
             onClick={() => setShowAdminLogin(true)}
             className="px-5 py-2.5 bg-gray-900 text-white font-bold rounded-xl text-sm hover:bg-gray-800 transition"
           >
-            ⚙️ Admin Boşqaruvi
+            ⚙️ Admin Boshqaruvi
           </button>
         ) : (
           <button 
             onClick={() => setIsAdmin(false)}
             className="px-5 py-2.5 bg-red-600 text-white font-bold rounded-xl text-sm hover:bg-red-700 transition"
           >
-            🚪 Admin rejimidan çiqiş
+            🚪 Admin rejimidan chiqish
           </button>
         )}
       </div>
@@ -125,11 +160,11 @@ export default function Achievements() {
       {showAdminLogin && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-2xl max-w-sm w-full shadow-2xl">
-            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin tizimiga kiriş</h3>
+            <h3 className="text-xl font-bold mb-4 text-gray-900">Admin tizimiga kirish</h3>
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <input
                 type="password"
-                placeholder="Admin paroliga kiriting..."
+                placeholder="Admin parolini kiriting..."
                 value={adminPass}
                 onChange={(e) => setAdminPass(e.target.value)}
                 className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -141,13 +176,13 @@ export default function Achievements() {
                   onClick={() => setShowAdminLogin(false)}
                   className="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-xl text-xs"
                 >
-                  Bekor qiliş
+                  Bekor qilish
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-orange-600 text-white font-bold rounded-xl text-xs hover:bg-orange-700"
                 >
-                  Kiriş
+                  Kirish
                 </button>
               </div>
             </form>
@@ -159,12 +194,12 @@ export default function Achievements() {
       {isAdmin && (
         <div className="bg-orange-50 border-2 border-orange-200 p-6 rounded-3xl mb-10 shadow-lg">
           <h2 className="text-xl font-black text-orange-900 mb-4 flex items-center gap-2">
-            <span>➕</span> Yangi Yutuq/Sertifikat Qöşiş (Admin Panel)
+            <span>➕</span> Yangi Yutuq/Sertifikat Qo'shish (Admin Panel)
           </h2>
           <form onSubmit={handleAdd} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Öquvçi F.I.Ş</label>
+                <label className="block text-xs font-bold text-gray-700 mb-1">O'quvchi F.I.Sh</label>
                 <input
                   type="text"
                   placeholder="Masalan: Amanov Sherzod"
@@ -196,7 +231,7 @@ export default function Achievements() {
                 >
                   <option value="Olimpiada">Olimpiada</option>
                   <option value="Sertifikat">Fan Sertifikati (IELTS, CEFR, IT)</option>
-                  <option value="Sport">Sport / Boşqa</option>
+                  <option value="Sport">Sport / Boshqa</option>
                 </select>
               </div>
             </div>
@@ -216,7 +251,7 @@ export default function Achievements() {
               type="submit"
               className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md shadow-orange-500/30 transition mt-2"
             >
-              Sertifikatni Saytga Joylaş
+              Sertifikatni Saytga Joylash
             </button>
           </form>
         </div>
@@ -251,7 +286,7 @@ export default function Achievements() {
                   onClick={() => handleDelete(item.id)}
                   className="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition"
                 >
-                  🗑 Öçiriş
+                  🗑 O'chirish
                 </button>
               </div>
             )}

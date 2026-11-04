@@ -1,34 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
 export default function News() {
   const defaultPlaceholder = 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&w=800&q=80';
 
-  // Dastlabki namunaviy yangiliklar
-  const initialNews = [
-    {
-      id: 1,
-      title: "Maktabimizda 'Zakovat' intellektual öyini bölib ötdi",
-      date: '2026-10-20',
-      category: 'Tadbirlar',
-      description: "Öquvçilarning mantiqiy fikrlash doirasini kengaytiriş maqsadida maktabimizda yuqori sinf öquvçilari örtasida 'Zakovat' turniri taşkil etildi.",
-      image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
-    },
-    {
-      id: 2,
-      title: "Robototexnika va IT böyiça yangi tögaraklar ish boşladi",
-      date: '2026-10-15',
-      category: 'IT va Innovatsiya',
-      description: "Zarbdor IMda öquvçilar uchun zamonaviy kompyuter va robototexnika vositalari bilan jihozlangan tögarak xonalari foydalanishga topşirildi.",
-      image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80'
-    }
-  ];
-
-  // LocalStorage orqali saqlangan yangiliklarni yuklash
-  const [newsList, setNewsList] = useState(() => {
-    const saved = localStorage.getItem('school_news');
-    return saved ? JSON.parse(saved) : initialNews;
-  });
-
+  const [newsList, setNewsList] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [adminPass, setAdminPass] = useState('');
@@ -39,9 +16,60 @@ export default function News() {
   const [description, setDescription] = useState('');
   const [uploadedImage, setUploadedImage] = useState('');
 
+  // 1. Firebase'dan yangiliklarni real vaqt rejimida (onSnapshot) o'qib olish
   useEffect(() => {
-    localStorage.setItem('school_news', JSON.stringify(newsList));
-  }, [newsList]);
+    const docRef = doc(db, "portal", "schoolData");
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.newsList && data.newsList.length > 0) {
+          setNewsList(data.newsList);
+        } else {
+          // Boshlang'ich namunaviy yangiliklar
+          const initialNews = [
+            {
+              id: 1,
+              title: "Maktabimizda 'Zakovat' intellektual öyini bölib ötdi",
+              date: '2026-10-20',
+              category: 'Tadbirlar',
+              description: "Öquvçilarning mantiqiy fikrlash doirasini kengaytiriş maqsadida maktabimizda yuqori sinf öquvçilari örtasida 'Zakovat' turniri taşkil etildi.",
+              image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
+            },
+            {
+              id: 2,
+              title: "Robototexnika va IT böyiça yangi tögaraklar ish boşladi",
+              date: '2026-10-15',
+              category: 'IT va Innovatsiya',
+              description: "Zarbdor IMda öquvçilar uchun zamonaviy kompyuter va robototexnika vositalari bilan jihozlangan tögarak xonalari foydalanishga topşirildi.",
+              image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80'
+            }
+          ];
+          setNewsList(initialNews);
+        }
+      }
+    }, (error) => {
+      console.error("Firestore tinglashda xatolik:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // 2. Firebase'ga yangilangan yangiliklar ro'yxatini saqlash funksiyasi
+  const saveToFirebase = async (updatedNews) => {
+    try {
+      const docRef = doc(db, "portal", "schoolData");
+      const docSnap = await getDoc(docRef);
+      const existingData = docSnap.exists() ? docSnap.data() : {};
+
+      await setDoc(docRef, {
+        ...existingData,
+        newsList: updatedNews
+      });
+      console.log("Yangiliklar Firebase'ga muvaffaqiyatli saqlandi!");
+    } catch (err) {
+      console.error("Firebase'ga saqlashda xatolik:", err);
+    }
+  };
 
   // Faylni kompyuterdan tanlab o'qib olish (Base64)
   const handleFileUpload = (e) => {
@@ -57,7 +85,6 @@ export default function News() {
 
   const handleAdminLogin = (e) => {
     e.preventDefault();
-    // Parolni shu yerdan o'zingiz xohlagan boshqa parolga o'zgartirishingiz mumkin
     if (adminPass === 'admin2026') { 
       setIsAdmin(true);
       setShowAdminLogin(false);
@@ -80,7 +107,10 @@ export default function News() {
       image: uploadedImage || defaultPlaceholder
     };
 
-    setNewsList([newItem, ...newsList]);
+    const updatedNews = [newItem, ...newsList];
+    setNewsList(updatedNews);
+    saveToFirebase(updatedNews); // <-- Firebase'ga saqlash
+
     setTitle('');
     setDescription('');
     setUploadedImage('');
@@ -90,7 +120,9 @@ export default function News() {
 
   const handleDeleteNews = (id) => {
     if (window.confirm("Haqiqatan ham ushbu yangilikni o'chirmoqchimisiz?")) {
-      setNewsList(newsList.filter(item => item.id !== id));
+      const updatedNews = newsList.filter(item => item.id !== id);
+      setNewsList(updatedNews);
+      saveToFirebase(updatedNews); // <-- Firebase'ga saqlash
     }
   };
 
@@ -154,7 +186,7 @@ export default function News() {
         </div>
       )}
 
-      {/* Admin Panel (Kodlarsiz Yangilik Qo'shish) */}
+      {/* Admin Panel (Yangilik Qo'shish) */}
       {isAdmin && (
         <div className="bg-orange-50 border-2 border-orange-200 p-6 rounded-3xl mb-10 shadow-lg">
           <h2 className="text-xl font-black text-orange-900 mb-4 flex items-center gap-2">

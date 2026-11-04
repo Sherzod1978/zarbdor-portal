@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
 export default function OnlineTestSystem({ currentSeason }) {
-  // Asosiy holatlar (States)
-  const [activeTab, setActiveTab] = useState('tests'); // 'tests', 'take-test', 'result', 'admin'
-  const [tests, setTests] = useState([
+  const initialTests = [
     {
       id: 1,
       title: "Python asoslari bo'yicha test",
@@ -13,7 +13,7 @@ export default function OnlineTestSystem({ currentSeason }) {
       questions: [
         {
           id: 1,
-          question: "Python dasturlaş tilida ekranga matn çiqariş uçun qaysi funksiya işlatiladi?",
+          question: "Python dasturlash tilida ekranga matn chiqarish uchun qaysi funksiya ishlatiladi?",
           options: ["print()", "echo()", "cout <<", "Console.WriteLine()"],
           correct: 0,
           points: 10,
@@ -31,8 +31,11 @@ export default function OnlineTestSystem({ currentSeason }) {
         }
       ]
     }
-  ]);
+  ];
 
+  // Asosiy holatlar (States)
+  const [activeTab, setActiveTab] = useState('tests'); // 'tests', 'take-test', 'result', 'admin'
+  const [tests, setTests] = useState([]);
   const [currentTest, setCurrentTest] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [studentInfo, setStudentInfo] = useState({ name: '', className: '' });
@@ -45,6 +48,43 @@ export default function OnlineTestSystem({ currentSeason }) {
   const [adminPassword, setAdminPassword] = useState('');
   const [submissions, setSubmissions] = useState([]); // O'quvchilar natijalari tarixi
   const [newTest, setNewTest] = useState({ title: '', subject: 'Informatika', duration: 15, shuffle: false });
+
+  // 1. Firebase'dan real vaqt rejimida (onSnapshot) o'qib olish
+  useEffect(() => {
+    const docRef = doc(db, "portal", "schoolData");
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setTests(data.onlineTests && data.onlineTests.length > 0 ? data.onlineTests : initialTests);
+        setSubmissions(data.onlineTestSubmissions || []);
+      } else {
+        setTests(initialTests);
+        setSubmissions([]);
+      }
+    }, (error) => {
+      console.error("Firestore tinglashda xatolik:", error);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // 2. Firebase'ga saqlash funksiyasi
+  const saveToFirebase = async (updatedTests, updatedSubmissions) => {
+    try {
+      const docRef = doc(db, "portal", "schoolData");
+      const docSnap = await getDoc(docRef);
+      const existingData = docSnap.exists() ? docSnap.data() : {};
+
+      await setDoc(docRef, {
+        ...existingData,
+        onlineTests: updatedTests || tests,
+        onlineTestSubmissions: updatedSubmissions || submissions
+      });
+      console.log("Onlayn testlar Firebase'ga saqlandi!");
+    } catch (err) {
+      console.error("Firebase'ga saqlashda xatolik:", err);
+    }
+  };
 
   // Savollar uchun taymer
   useEffect(() => {
@@ -78,7 +118,7 @@ export default function OnlineTestSystem({ currentSeason }) {
 
   // Keyingi savolga o'tish
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < currentTest.questions.length - 1) {
+    if (currentTest && currentQuestionIndex < currentTest.questions.length - 1) {
       const nextIdx = currentQuestionIndex + 1;
       setCurrentQuestionIndex(nextIdx);
       setTimeLeft(currentTest.questions[nextIdx].timer || 30);
@@ -104,7 +144,7 @@ export default function OnlineTestSystem({ currentSeason }) {
       }
     });
 
-    const percentage = Math.round((totalScore / maxScore) * 100);
+    const percentage = maxScore > 0 ? Math.round((totalScore / maxScore) * 100) : 0;
     let grade = "Qoniqarsiz";
     if (percentage >= 85) grade = "A'lo (5)";
     else if (percentage >= 70) grade = "Yaxshi (4)";
@@ -123,7 +163,9 @@ export default function OnlineTestSystem({ currentSeason }) {
     };
 
     setTestResult(resultData);
-    setSubmissions([resultData, ...submissions]);
+    const updatedSubmissions = [resultData, ...submissions];
+    setSubmissions(updatedSubmissions);
+    saveToFirebase(tests, updatedSubmissions); // <-- Firebase'ga saqlash
     setActiveTab('result');
   };
 
@@ -191,7 +233,7 @@ export default function OnlineTestSystem({ currentSeason }) {
                       {test.subject}
                     </span>
                     <h3 className="text-xl font-bold text-gray-900 mt-3 mb-2">{test.title}</h3>
-                    <p className="text-sm text-gray-600 mb-4">Savollar soni: {test.questions.length} ta | Vaqt: {test.duration} daqiqa</p>
+                    <p className="text-sm text-gray-600 mb-4">Savollar soni: {test.questions?.length || 0} ta | Vaqt: {test.duration} daqiqa</p>
                   </div>
                   <button 
                     onClick={() => startTest(test)}
@@ -257,7 +299,7 @@ export default function OnlineTestSystem({ currentSeason }) {
             onClick={handleNextQuestion}
             className="w-full py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg transition"
           >
-            {currentQuestionIndex < currentTest.questions.length - 1 ? "Keyingi savol →" : "Testni yakunlaş va topşiriş ✓"}
+            {currentQuestionIndex < currentTest.questions.length - 1 ? "Keyingi savol →" : "Testni yakunlash va topshirish ✓"}
           </button>
         </div>
       )}
@@ -277,11 +319,11 @@ export default function OnlineTestSystem({ currentSeason }) {
               <span className="text-2xl font-black text-gray-900">{testResult.totalScore} / {testResult.maxScore}</span>
             </div>
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
-              <span className="text-xs text-gray-500 block">Foiz körsatkiçi</span>
+              <span className="text-xs text-gray-500 block">Foiz ko'rsatkichi</span>
               <span className="text-2xl font-black text-orange-600">{testResult.percentage}%</span>
             </div>
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
-              <span className="text-xs text-gray-500 block">Töğri / Notöğri</span>
+              <span className="text-xs text-gray-500 block">To'g'ri / Noto'g'ri</span>
               <span className="text-xl font-bold text-emerald-600">{testResult.correctCount}</span> / <span className="text-xl font-bold text-rose-600">{testResult.incorrectCount}</span>
             </div>
             <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200">
@@ -294,7 +336,7 @@ export default function OnlineTestSystem({ currentSeason }) {
             onClick={() => setActiveTab('tests')}
             className="px-8 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg transition"
           >
-            ← Boş sahifaga qaytiş
+            ← Bosh sahifaga qaytish
           </button>
         </div>
       )}
@@ -304,8 +346,8 @@ export default function OnlineTestSystem({ currentSeason }) {
         <div className="space-y-8">
           {!isAdminLoggedIn ? (
             <div className="max-w-md mx-auto bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-200 text-center">
-              <h2 className="text-2xl font-black text-gray-900 mb-2">🔐 Admin kiriş</h2>
-              <p className="text-sm text-gray-600 mb-6">Testlarni boşqariş uçun parolni kiriting.</p>
+              <h2 className="text-2xl font-black text-gray-900 mb-2">🔐 Admin kirish</h2>
+              <p className="text-sm text-gray-600 mb-6">Testlarni boshqarish uchun parolni kiriting.</p>
               <input 
                 type="password"
                 placeholder="Parol (admin2026)"
@@ -318,29 +360,29 @@ export default function OnlineTestSystem({ currentSeason }) {
                   if (adminPassword === 'admin2026') {
                     setIsAdminLoggedIn(true);
                   } else {
-                    alert("Parol notöğri!");
+                    alert("Parol noto'g'ri!");
                   }
                 }}
                 className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md transition"
               >
-                Kiriş
+                Kirish
               </button>
             </div>
           ) : (
             <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-200">
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-                <h2 className="text-2xl font-black text-gray-900">⚙️ Öqituvçi boşqaruv paneli</h2>
+                <h2 className="text-2xl font-black text-gray-900">⚙️ O'qituvchi boshqaruv paneli</h2>
                 <button 
                   onClick={() => setIsAdminLoggedIn(false)}
                   className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl text-xs transition"
                 >
-                  Çiqiş
+                  Chiqish
                 </button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">➕ Yangi test qöşiş</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">➕ Yangi test qo'shish</h3>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1">Test Nomi</label>
@@ -365,13 +407,15 @@ export default function OnlineTestSystem({ currentSeason }) {
                     <button 
                       onClick={() => {
                         if (!newTest.title) return alert("Test nomini kiriting!");
-                        setTests([...tests, { id: Date.now(), ...newTest, questions: [] }]);
+                        const updatedTests = [...tests, { id: Date.now(), ...newTest, questions: [] }];
+                        setTests(updatedTests);
+                        saveToFirebase(updatedTests, submissions); // <-- Firebase'ga saqlash
                         setNewTest({ title: '', subject: 'Informatika', duration: 15, shuffle: false });
-                        alert("Yangi test muvaffaqiyatli qöşildi!");
+                        alert("Yangi test muvaffaqiyatli qo'shildi!");
                       }}
                       className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md transition"
                     >
-                      Test yaratiş
+                      Test yaratish
                     </button>
                   </div>
                 </div>

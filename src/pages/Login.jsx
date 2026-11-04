@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -26,7 +28,7 @@ export default function Login() {
         localStorage.setItem('refresh_token', data.refresh);
         
         // Hamkorlik sahifasiga yo'naltiramiz
-        window.location.href = '/collaboration'; 
+        navigate('/collaboration');
       } else {
         setError('Login yoki parol xato kiritildi!');
       }

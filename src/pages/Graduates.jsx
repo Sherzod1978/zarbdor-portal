@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 
 export default function Graduates({ currentSeason }) {
   const [graduates, setGraduates] = useState([]);
@@ -16,27 +18,53 @@ export default function Graduates({ currentSeason }) {
     videoUrl: ''
   });
 
-  // Saqlangan bitiruvchilarni yuklash
+  // 1. Firebase'dan bitiruvchilarni real vaqt rejimida (onSnapshot) o'qib olish
   useEffect(() => {
-    const saved = localStorage.getItem('school_graduates');
-    if (saved) {
-      setGraduates(JSON.parse(saved));
-    } else {
-      const initialData = [
-        {
-          id: 1,
-          name: "Azizbek Rahimov",
-          year: "2024",
-          currentRole: "TATU 2-bosqich talabasi",
-          achievements: "Respublika Informatika olimpiadasi ğolibi",
-          image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
-          videoUrl: ""
+    const docRef = doc(db, "portal", "schoolData");
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.graduates && data.graduates.length > 0) {
+          setGraduates(data.graduates);
+        } else {
+          // Agar baza bo'sh bo'lsa boshlang'ich ma'lumot yuklash
+          const initialData = [
+            {
+              id: 1,
+              name: "Aziza Rahimova",
+              year: "2024",
+              currentRole: "TATU 2-bosqich talabasi",
+              achievements: "Respublika Informatika olimpiadasi g'olibi",
+              image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400",
+              videoUrl: ""
+            }
+          ];
+          setGraduates(initialData);
         }
-      ];
-      setGraduates(initialData);
-      localStorage.setItem('school_graduates', JSON.stringify(initialData));
-    }
+      }
+    }, (error) => {
+      console.error("Firestore tinglaşda xatolik:", error);
+    });
+
+    return () => unsubscribe();
   }, []);
+
+  // 2. Firebase'ga yangilangan ro'yxatni saqlash funksiyasi
+  const saveToFirebase = async (updatedGraduates) => {
+    try {
+      const docRef = doc(db, "portal", "schoolData");
+      const docSnap = await getDoc(docRef);
+      const existingData = docSnap.exists() ? docSnap.data() : {};
+
+      await setDoc(docRef, {
+        ...existingData,
+        graduates: updatedGraduates
+      });
+      console.log("Bitiruvçilar Firebase'ga muvaffaqiyatli saqlandi!");
+    } catch (err) {
+      console.error("Firebase'ga saqlaşda xatolik:", err);
+    }
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -76,7 +104,7 @@ export default function Graduates({ currentSeason }) {
 
     const updated = [newGrad, ...graduates];
     setGraduates(updated);
-    localStorage.setItem('school_graduates', JSON.stringify(updated));
+    saveToFirebase(updated); // <-- Firebasega saqlash chaqirildi
 
     setFormData({
       name: '',
@@ -89,10 +117,10 @@ export default function Graduates({ currentSeason }) {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("Haqiqatan ham uşbu ma'lumotni öchirmoqçimisiz?")) {
+    if (window.confirm("Haqiqatan ham uşbu ma'lumotni öçirmoqçimisiz?")) {
       const updated = graduates.filter(item => item.id !== id);
       setGraduates(updated);
-      localStorage.setItem('school_graduates', JSON.stringify(updated));
+      saveToFirebase(updated); // <-- Firebasega saqlash chaqirildi
     }
   };
 
@@ -118,7 +146,7 @@ export default function Graduates({ currentSeason }) {
               onClick={() => setIsAdmin(false)}
               className="px-4 py-2 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-500 transition"
             >
-              🚪 Chiqiş
+              🚪 Çiqiş
             </button>
           )}
         </div>
@@ -166,7 +194,6 @@ export default function Graduates({ currentSeason }) {
               className="p-3 border rounded-xl bg-white"
             />
             
-            {/* Kompyuterdan rasm tanlash inputi */}
             <div className="flex flex-col justify-center bg-white p-2 border rounded-xl">
               <label className="text-xs text-gray-500 mb-1 font-semibold">Kompyuterdan rasm tanlaş:</label>
               <input 
