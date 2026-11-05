@@ -157,7 +157,7 @@ export default function Graduates({ currentSeason }) {
           <h3 className="text-lg font-bold mb-4">Admin boşqaruvi paroli:</h3>
           <input 
             type="password" 
-            placeholder="Parolni kiriting (admin123)"
+            placeholder="Parolni kiriting ..."
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-2 border rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-orange-500"

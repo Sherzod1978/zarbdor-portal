@@ -16,7 +16,7 @@ export default function About({ currentSeason }) {
       name: "Feruz Qarabayev", 
       role: "Maktab Direktori", 
       image: "/direktor.png",
-      desc: "Maktab faoliyatini boshqarish va ta'lim sifatini nazorat qilish bo'yicha yuqori tajribaga ega rahbar."
+      desc: "Maktab faoliyatini boşqarish va ta'lim sifatini nazorat qilish bo'yicha yuqori tajribaga ega rahbar."
     },
     { 
       name: "Şohjahon Amirov", 
@@ -29,6 +29,12 @@ export default function About({ currentSeason }) {
       role: "Ma'naviy va ma'rifiy işlar böyiça direktor örinbosari", 
       image: "/Dilfuza.jpg",
       desc: "Öquvçilar örtasida ma'naviy-axloqiy muhitni şakllantiriş va loyihalarni boşqariş."
+    },
+    { 
+      name: "Iroda Nişonova", // 4-shaxs misoli
+      role: "Maktab psixologi", 
+      image: "/Iroda.png",
+      desc: "Öquvçilarning ruhiy holatini kuzatiş, ularga psixologik yordam körsatiriş va şaxsiy rivojlanişiga kömaklaşiş.  "
     }
   ];
 
@@ -76,11 +82,11 @@ export default function About({ currentSeason }) {
             ← Boş sahifaga qaytiş
           </Link>
           <h1 className="text-4xl md:text-5xl font-extrabold text-blue-950 mb-4 drop-shadow-sm">
-  Maktabimiz Haqida
-</h1>
-<p className="text-lg md:text-xl font-medium text-blue-900 max-w-2xl mx-auto leading-relaxed">
-  Zarbdor Ixtisoslaştirilgan Maktabi — iqtidorli yoşlarni kaşf etuvçi va ularni kelajak yetakçilariga aylantiruvçi maskan.
-</p>
+            Maktabimiz haqida
+          </h1>
+          <p className="text-lg md:text-xl font-medium text-blue-900 max-w-2xl mx-auto leading-relaxed">
+            Zarbdor Ixtisoslaştirilgan Maktabi — iqtidorli yoşlarni kaşf etuvçi va ularni kelajak yetakçilariga aylantiruvçi maskan.
+          </p>
         </div>
       </div>
 
@@ -88,35 +94,33 @@ export default function About({ currentSeason }) {
       <section className="max-w-6xl mx-auto px-6 py-16 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="text-orange-600 font-extrabold text-sm uppercase tracking-wider">Bizning Missiyamiz</span>
-            <h2 className="text-3xl md:text-4xl font-extrabold mt-2 mb-6">Kelajak Texnologiyalari va Mukammal Ta'lim</h2>
+            <span className="text-orange-600 font-extrabold text-sm uppercase tracking-wider">Bizning missiyamiz</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold mt-2 mb-6">Kelajak texnologiyalari va mukammal ta'lim</h2>
             <p className="text-lg text-gray-700 leading-relaxed mb-4">
-              Maktabimiz o'quvchilarga chuqurlashtirilgan aniq va tabiiy fanlar, zamonaviy axborot texnologiyalari hamda xorijiy tillarni mukammal o'rgatishga ixtisoslashgan.
+              Maktabimiz öquvçilarga çuqurlaştirilgan aniq va tabiiy fanlar, zamonaviy axborot texnologiyalari hamda xorijiy tillarni mukammal örgatişga ixtisoslaşgan.
             </p>
             <p className="text-lg text-gray-700 leading-relaxed">
-              Biz har bir o'quvchining shaxsiy iqtidorini yuzaga chiqarish uchun xavfsiz, zamonaviy va rag'batlantiruvchi ta'lim muhitini yaratamiz.
+              Biz har bir öquvçining şaxsiy iqtidorini yuzaga çiqariş uçun xavfsiz, zamonaviy va rağbatlantiruvçi ta'lim muhitini yaratamiz.
             </p>
           </div>
           <div className="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-gray-100 relative overflow-hidden">
             <div className="text-6xl mb-4">🏛️</div>
             <h3 className="text-2xl font-bold mb-2">Prezident Agentligi Tizimida</h3>
             <p className="text-gray-600 text-lg">
-              Ixtisoslashtirilgan ta'lim muassasalari agentligi tizimiga kiruvchi ushbu maktabda darslar xalqaro standartlar va ilg'or metodikalar asosida olib boriladi.
+              Ixtisoslaştirilgan ta'lim muassasalari agentligi tizimiga kiruvçi uşbu maktabda darslar xalqaro standartlar va ilğor metodikalar asosida olib boriladi.
             </p>
           </div>
         </div>
       </section>
 
-     
-      {/* Maktab Rahbariyati va Mutaxassislar */}
-      <section className="max-w-[1400px] mx-auto px-6 py-16 relative z-10">
+      {/* Maktab Rahbariyati va Mutaxassislar (4 ta shaxs uchun lg:grid-cols-4) */}
+      <section className="max-w-[1500px] mx-auto px-6 py-16 relative z-10">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-black text-gray-900">Maktab Rahbariyati va Mutaxassislar</h2>
           <p className="text-gray-600 text-lg mt-2">Tajribali va fidoyi jamoamiz bilan tanishing</p>
         </div>
 
-        {/* 3 ta rahbar uchun aniq 3 ta ustun (lg:grid-cols-3) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-center">
           {management.map((person, idx) => (
             <div 
               key={idx} 
