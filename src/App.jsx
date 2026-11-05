@@ -230,19 +230,19 @@ export default function App() {
           
           {/* Rasm ikonkali Google Maps havolasi */}
           <a 
-            href="https://maps.google.com/?q=Zarbdor+ixtisoslashtirilgan+maktabi+Jizzax" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-xl shadow-md transition hover:scale-105"
-            title="Google xaritada köriş"
-          >
-            <img 
-              src="/location.png" 
-              alt="Location icon" 
-              className="w-4 h-4 object-contain"
-            />
-            <span>Xaritada köriş</span>
-          </a>
+  href="https://maps.google.com/?q=Zarbdor+ixtisoslashtirilgan+maktabi+Jizzax" 
+  target="_blank" 
+  rel="noopener noreferrer"
+  className="inline-flex items-center gap-1.5 px-3 py-1 bg-transparent hover:bg-orange-600 text-white text-xs font-bold rounded-xl border border-white/20 shadow-md transition-all duration-300 hover:scale-105"
+  title="Google xaritada köriş"
+>
+  <img 
+    src="/location.png" 
+    alt="Location icon" 
+    className="w-4 h-4 object-contain"
+  />
+  <span>Xaritada köriş</span>
+</a>
         </div>
         <p><strong className="text-white">Tel:</strong> +998 (94) 344-92-07</p>
         <p><strong className="text-white">Email:</strong> info@zarbdorim.uz</p>
