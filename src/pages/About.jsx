@@ -33,7 +33,7 @@ export default function About({ currentSeason }) {
     { 
       name: "Iroda Nişonova", // 4-shaxs misoli
       role: "Maktab psixologi", 
-      image: "/Iroda.png",
+      image: "/Iroda.jpg",
       desc: "Öquvçilarning ruhiy holatini kuzatiş, ularga psixologik yordam körsatiriş va şaxsiy rivojlanişiga kömaklaşiş.  "
     }
   ];
