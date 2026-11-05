@@ -206,72 +206,90 @@ export default function App() {
         </Routes>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-[#1f1f1f] text-white pt-12 pb-8 border-t border-gray-800 z-10 relative">
-        <div 
-          style={{ 
-            display: 'flex', 
-            flexDirection: 'row', 
-            justifyContent: 'space-around', 
-            alignItems: 'flex-start',
-            flexWrap: 'wrap', 
-            maxWidth: '1200px', 
-            margin: '0 auto', 
-            padding: '0 20px',
-            gap: '40px'
-          }}
-          className="mb-10"
-        >
-          <div style={{ minWidth: '280px' }}>
-            <h3 className="text-xl font-bold mb-4 text-white">Zarbdor IM</h3>
-            <div className="space-y-2 text-gray-300 text-sm md:text-base leading-relaxed">
-              <p><span className="font-semibold text-white">Manzil:</span> Jizzax viloyati, Zarbdor tumani</p>
-              <p><span className="font-semibold text-white">Tel:</span> +998 (94) 344-92-07</p>
-              <p><span className="font-semibold text-white">Email:</span> info@zarbdorim.uz</p>
-            </div>
-          </div>
-
-          <div style={{ minWidth: '220px' }}>
-            <h3 className="text-xl font-bold mb-4 text-white">Tezkor Havolalar</h3>
-            <ul className="space-y-2 text-sm md:text-base list-disc list-inside">
-              <li>
-                <Link to="/about" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Maktab haqida
-                </Link>
-              </li>
-              <li>
-                <Link to="/achievements" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Yutuqlar
-                </Link>
-              </li>
-              <li>
-                <Link to="/graduates" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Bitiruvçilar
-                </Link>
-              </li>
-              <li>
-                <Link to="/admission" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Qabul şartlari
-                </Link>
-              </li>
-              <li>
-                <Link to="/news" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Yangiliklar
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
-                  Boğlaniş
-                </Link>
-              </li>
-            </ul>
-          </div>
+        {/* Footer */}
+<footer className="bg-[#1f1f1f] text-white pt-12 pb-8 border-t border-gray-800 z-10 relative">
+  <div 
+    style={{ 
+      display: 'flex', 
+      flexDirection: 'row', 
+      justifyContent: 'space-around', 
+      alignItems: 'flex-start',
+      flexWrap: 'wrap', 
+      maxWidth: '1200px', 
+      margin: '0 auto', 
+      padding: '0 20px',
+      gap: '40px' 
+    }}
+    className="mb-10"
+  >
+    <div style={{ minWidth: '280px' }}>
+      <h3 className="text-xl font-bold mb-4 text-white">Zarbdor IM</h3>
+      <div className="space-y-3 text-gray-300 text-sm md:text-base leading-relaxed">
+        <div className="flex flex-wrap items-center gap-2">
+          <span><strong className="text-white">Manzil:</strong> Jizzax viloyati, Zarbdor tumani</span>
+          
+          {/* Rasm ikonkali Google Maps havolasi */}
+          <a 
+            href="https://maps.google.com/?q=Zarbdor+ixtisoslashtirilgan+maktabi+Jizzax" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-xl shadow-md transition hover:scale-105"
+            title="Google xaritada köriş"
+          >
+            <img 
+              src="/location.png" 
+              alt="Location icon" 
+              className="w-4 h-4 object-contain"
+            />
+            <span>Xaritada köriş</span>
+          </a>
         </div>
+        <p><strong className="text-white">Tel:</strong> +998 (94) 344-92-07</p>
+        <p><strong className="text-white">Email:</strong> info@zarbdorim.uz</p>
+      </div>
+    </div>
 
-        <div className="border-t border-gray-800 pt-6 text-center text-xs md:text-sm text-gray-400">
-          © Zarbdor ixtisoslaştirilgan maktabi - 2026
-        </div>
-      </footer>
+    <div style={{ minWidth: '220px' }}>
+      <h3 className="text-xl font-bold mb-4 text-white">Tezkor Havolalar</h3>
+      <ul className="space-y-2 text-sm md:text-base list-disc list-inside">
+        <li>
+          <Link to="/about" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
+            Maktab haqida
+          </Link>
+        </li>
+        <li>
+          <Link to="/achievements" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
+            Yutuqlar
+          </Link>
+        </li>
+        <li>
+          <Link to="/graduates" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
+            Bitiruvçilar
+          </Link>
+        </li>
+        <li>
+          <Link to="/admission" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
+            Qabul şartlari
+          </Link>
+        </li>
+        <li>
+          <Link to="/news" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
+            Yangiliklar
+          </Link>
+        </li>
+        <li>
+          <Link to="/contact" className="text-indigo-400 hover:text-indigo-300 hover:underline transition">
+            Boğlaniş
+          </Link>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div className="border-t border-gray-800 pt-6 text-center text-xs md:text-sm text-gray-400">
+    © Zarbdor ixtisoslaştirilgan maktabi - 2026
+  </div>
+</footer>
 
     </div>
   );
