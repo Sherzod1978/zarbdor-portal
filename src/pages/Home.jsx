@@ -100,26 +100,7 @@ export default function Home({ current, searchQuery }) {
             </div>
           </div>
 
-          {/* Real vaqt rejimida keladigan mavjud fanlar va testlar körinişi */}
-          {Object.keys(subjectsData).length > 0 && (
-            <div className="max-w-6xl mx-auto px-6 py-8">
-              <h2 className="text-3xl font-black text-gray-900 mb-6 text-center">📚 Mavjud online testlar va fanlar</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {Object.entries(subjectsData).map(([subName, subObj]) => (
-                  <div key={subName} className="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
-                    <h3 className="text-xl font-bold text-orange-600 mb-2">{subName}</h3>
-                    <p className="text-xs text-gray-500 mb-4">Öqituvçi: {subObj.teacher || "Mavjud emas"}</p>
-                    <div className="space-y-2">
-                      <span className="text-sm font-semibold text-gray-700 block">Testlar soni: {subObj.tests?.length || 0} ta</span>
-                      <Link to="/collaboration" className="inline-block w-full text-center py-2 bg-orange-100 text-orange-700 font-bold rounded-xl text-xs hover:bg-orange-200 transition">
-                        Test topşiriş ↗
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          
         </div>
       )}
     </div>
