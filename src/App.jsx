@@ -240,9 +240,7 @@ export default function App() {
     src="/location.png" 
     alt="Location icon" 
     className="w-4 h-4 object-contain"
-  />
-  <span>Xaritada köriş</span>
-</a>
+  />  </a>
         </div>
         <p><strong className="text-white">Tel:</strong> +998 (94) 344-92-07</p>
         <p><strong className="text-white">Email:</strong> info@zarbdorim.uz</p>
