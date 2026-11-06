@@ -17,15 +17,16 @@ export default function News() {
   const [uploadedImage, setUploadedImage] = useState('');
 
   // 1. Firebase'dan yangiliklarni real vaqt rejimida (onSnapshot) o'qib olish
+  // 1. Firebase'dan yangiliklarni real vaqt rejimida o'qib olish
   useEffect(() => {
     const docRef = doc(db, "portal", "schoolData");
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+    const unsubscribe = onSnapshot(docRef, async (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (data.newsList && data.newsList.length > 0) {
           setNewsList(data.newsList);
         } else {
-          // Boshlang'ich namunaviy yangiliklar
+          // Agar baza bo'sh bo'lsagina bir marta namunaviy yangiliklarni yozamiz
           const initialNews = [
             {
               id: 1,
@@ -45,7 +46,13 @@ export default function News() {
             }
           ];
           setNewsList(initialNews);
+          await setDoc(docRef, { ...data, newsList: initialNews }, { merge: true });
         }
+      } else {
+        // Hujjat umuman mavjud bo'lmasa yaratib qo'yish
+        const initialNews = [...]; // yuqoridagi namunalar
+        setNewsList(initialNews);
+        await setDoc(docRef, { newsList: initialNews });
       }
     }, (error) => {
       console.error("Firestore tinglashda xatolik:", error);
@@ -109,12 +116,13 @@ export default function News() {
 
     const updatedNews = [newItem, ...newsList];
     setNewsList(updatedNews);
-    saveToFirebase(updatedNews); // <-- Firebase'ga saqlash
+    saveToFirebase(updatedNews);
 
+    // Formani tozalash
     setTitle('');
     setDescription('');
     setUploadedImage('');
-    e.target.reset();
+    document.getElementById("newsForm").reset(); // Formaga id berib tozalash xavfsizroq
     alert("Yangi yangilik muvaffaqiyatli e'lon qilindi!");
   };
 
