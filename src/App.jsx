@@ -226,7 +226,7 @@ export default function App() {
       <h3 className="text-xl font-bold mb-4 text-white">Zarbdor IM</h3>
       <div className="space-y-3 text-gray-300 text-sm md:text-base leading-relaxed">
         <div className="flex flex-wrap items-center gap-2">
-          <span><strong className="text-white">Manzil:</strong> Jizzax viloyati, Zarbdor tumani</span>
+          <span><strong className="text-white">Manzil:</strong> Jizzax viloyati, Zarbdor tumani </span>
           
           {/* Rasm ikonkali Google Maps havolasi */}
           <a 
@@ -239,7 +239,7 @@ export default function App() {
   <img 
     src="/location.png" 
     alt="Location icon" 
-    className="w-4 h-4 object-contain"
+    className="w-5 h-5 object-contain"
   />  </a>
         </div>
         <p><strong className="text-white">Tel:</strong> +998 (94) 344-92-07</p>
