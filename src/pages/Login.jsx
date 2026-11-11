@@ -1,107 +1,118 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function Login() {
-  const navigate = useNavigate();
-  const [username, setUsername] = useState('');
+export default function Login({ currentSeason }) {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    setError('');
-
-    try {
-      const response = await fetch('https://zarbdor-portal.onrender.com/api/token/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        // JWT tokenlarni saqlaymiz
-        localStorage.setItem('access_token', data.access);
-        localStorage.setItem('refresh_token', data.refresh);
-        
-        // Hamkorlik sahifasiga yo'naltiramiz
-        navigate('/collaboration');
-      } else {
-        setError('Login yoki parol xato kiritildi!');
-      }
-    } catch (err) {
-      setError('Server bilan ulanishda xatolik yuz berdi!');
+    // Bu yerda kirish mantiqi yoziladi (masalan, admin yoki o'qituvchi sifatida)
+    if (email === 'admin@zarbdorim.uz') {
+      navigate('/admin');
+    } else {
+      navigate('/collaboration');
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col justify-between">
-      <div className="flex-grow flex items-center justify-center px-4 py-12">
-        <div className="max-w-md w-full bg-slate-800 p-8 rounded-xl shadow-2xl border border-slate-700">
-          <h2 className="text-3xl font-bold text-center mb-6 text-orange-500">Zarbdor IM</h2>
-          <p className="text-center text-slate-400 text-sm mb-6">O'qituvchilar va o'quvchilar hamkorligi</p>
-          
-          {error && (
-            <div className="mb-4 p-3 bg-red-900/50 border border-red-500 text-red-200 rounded text-center text-sm">
-              {error}
-            </div>
-          )}
+    <div className="min-h-screen flex flex-col md:flex-row bg-white text-gray-900 font-sans">
+      
+      {/* Chap tomon: Rasm va qiziqarli ma'lumot */}
+      <div className="hidden md:flex md:w-1/2 bg-gray-50 flex-col justify-between p-12 border-r border-gray-100">
+        <div className="flex items-center gap-3">
+          <Link to="/" className="text-xl font-black text-orange-600">← Boş sahifaga qaytiş</Link>
+        </div>
+        
+        <div className="max-w-md mx-auto text-center space-y-6">
+          <div className="text-6xl flex justify-center">🎓</div>
+          <h2 className="text-2xl font-black text-gray-800">Zarbdor IM Hamkorlik Tizimi</h2>
+          <p className="text-gray-600 text-sm leading-relaxed">
+            Öqituvçilar va öquvçilar o'rtasida uzluksiz ta'lim muhiti, raqamli testlar hamda bilim almashinish maskani.
+          </p>
+        </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+        <div className="bg-orange-50 p-6 rounded-2xl border border-orange-100 text-center">
+          <h4 className="font-bold text-orange-800 text-sm mb-1">Bilarmidingiz?</h4>
+          <p className="text-xs text-orange-700">
+            Har bir öquvçi öz ustida işlab, fanlar böyiça yuqori natijalarga erişişi mumkin.
+          </p>
+        </div>
+      </div>
+
+      {/* O'ng tomon: Kirish Formasi */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-8 md:p-16">
+        <div className="w-full max-w-md space-y-8">
+          
+          <div>
+            <h2 className="text-3xl font-black tracking-tight text-gray-900">Tizimga kiriş</h2>
+            <p className="text-sm text-gray-500 mt-2">Email yoki foydalanuvçi nomi orqali kiring</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium mb-1 text-slate-300">Foydalanuvchi nomi (Login)</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+              <label className="block text-xs font-bold uppercase text-gray-600 mb-2">
+                Email yoki foydalanuvçi nomi <span className="text-red-500">*</span>
+              </label>
+              <input 
+                type="text" 
                 required
-                className="w-full px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:border-orange-500 text-white"
-                placeholder="Loginni kiriting"
+                placeholder="email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border-1.5 border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm transition"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1 text-slate-300">Parol</label>
+              <label className="block text-xs font-bold uppercase text-gray-600 mb-2">
+                Parol <span className="text-red-500">*</span>
+              </label>
+              
+              {/* Parol konteyneri va ko'zcha tugmasi */}
               <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  required
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-2.5 bg-slate-900 border border-slate-600 rounded-lg focus:outline-none focus:border-orange-500 text-white pr-10"
-                  placeholder="Parolni kiriting"
+                  className="w-full px-4 py-3 pr-12 border-1.5 border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm transition"
                 />
-                <button
+                <button 
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xl focus:outline-none select-none p-1"
+                  title={showPassword ? "Parolni yashirish" : "Parolni ko'rsatish"}
                 >
-                  {showPassword ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.032 10.032 0 012.245-3.515M17.657 16.657L13.414 12.414m2.828-9.9a9.969 9.969 0 012.385 2.722M3 3l18 18" />
-                    </svg>
-                  )}
+                  {showPassword ? '🙈' : '👁️'}
                 </button>
               </div>
             </div>
 
-            <button
+            <div className="flex items-center justify-between text-sm">
+              <Link to="/contact" className="text-orange-600 hover:underline font-semibold">
+                Parolni unutdingizmi?
+              </Link>
+            </div>
+
+            <button 
               type="submit"
-              className="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition duration-200 mt-2 shadow-lg"
+              className="w-full py-3.5 bg-gray-900 hover:bg-orange-600 text-white font-bold rounded-xl transition duration-300 shadow-lg"
             >
-              Tizimga kirish
+              Kiriş
             </button>
           </form>
+
+          <div className="text-center text-xs text-gray-500">
+            Tizimga kiriş orqali siz barça qoidalarga rozilik bildirasiz.
+          </div>
+
         </div>
       </div>
+
     </div>
   );
 }
