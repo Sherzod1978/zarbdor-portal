@@ -16,7 +16,26 @@ export default function News() {
   const [description, setDescription] = useState('');
   const [uploadedImage, setUploadedImage] = useState('');
 
-  // 1. Firebase'dan yangiliklarni real vaqt rejimida (onSnapshot) o'qib olish
+  // Namunaviy yangiliklar massivi
+  const initialNewsSamples = [
+    {
+      id: 1,
+      title: "Maktabimizda 'Zakovat' intellektual öyini bölib ötdi",
+      date: '2026-10-20',
+      category: 'Tadbirlar',
+      description: "Öquvçilarning mantiqiy fikrlash doirasini kengaytiriş maqsadida maktabimizda yuqori sinf öquvçilari örtasida 'Zakovat' turniri taşkil etildi.",
+      image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
+    },
+    {
+      id: 2,
+      title: "Robototexnika va IT böyiça yangi tögaraklar ish boşladi",
+      date: '2026-10-15',
+      category: 'IT va Innovatsiya',
+      description: "Zarbdor IMda öquvçilar uchun zamonaviy kompyuter va robototexnika vositalari bilan jihozlangan tögarak xonalari foydalanishga topşirildi.",
+      image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80'
+    }
+  ];
+
   // 1. Firebase'dan yangiliklarni real vaqt rejimida o'qib olish
   useEffect(() => {
     const docRef = doc(db, "portal", "schoolData");
@@ -26,33 +45,12 @@ export default function News() {
         if (data.newsList && data.newsList.length > 0) {
           setNewsList(data.newsList);
         } else {
-          // Agar baza bo'sh bo'lsagina bir marta namunaviy yangiliklarni yozamiz
-          const initialNews = [
-            {
-              id: 1,
-              title: "Maktabimizda 'Zakovat' intellektual öyini bölib ötdi",
-              date: '2026-10-20',
-              category: 'Tadbirlar',
-              description: "Öquvçilarning mantiqiy fikrlash doirasini kengaytiriş maqsadida maktabimizda yuqori sinf öquvçilari örtasida 'Zakovat' turniri taşkil etildi.",
-              image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
-            },
-            {
-              id: 2,
-              title: "Robototexnika va IT böyiça yangi tögaraklar ish boşladi",
-              date: '2026-10-15',
-              category: 'IT va Innovatsiya',
-              description: "Zarbdor IMda öquvçilar uchun zamonaviy kompyuter va robototexnika vositalari bilan jihozlangan tögarak xonalari foydalanishga topşirildi.",
-              image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80'
-            }
-          ];
-          setNewsList(initialNews);
-          await setDoc(docRef, { ...data, newsList: initialNews }, { merge: true });
+          setNewsList(initialNewsSamples);
+          await setDoc(docRef, { ...data, newsList: initialNewsSamples }, { merge: true });
         }
       } else {
-        // Hujjat umuman mavjud bo'lmasa yaratib qo'yish
-        const initialNews = [...]; // yuqoridagi namunalar
-        setNewsList(initialNews);
-        await setDoc(docRef, { newsList: initialNews });
+        setNewsList(initialNewsSamples);
+        await setDoc(docRef, { newsList: initialNewsSamples });
       }
     }, (error) => {
       console.error("Firestore tinglashda xatolik:", error);
@@ -72,7 +70,6 @@ export default function News() {
         ...existingData,
         newsList: updatedNews
       });
-      console.log("Yangiliklar Firebase'ga muvaffaqiyatli saqlandi!");
     } catch (err) {
       console.error("Firebase'ga saqlashda xatolik:", err);
     }
@@ -118,11 +115,9 @@ export default function News() {
     setNewsList(updatedNews);
     saveToFirebase(updatedNews);
 
-    // Formani tozalash
     setTitle('');
     setDescription('');
     setUploadedImage('');
-    document.getElementById("newsForm").reset(); // Formaga id berib tozalash xavfsizroq
     alert("Yangi yangilik muvaffaqiyatli e'lon qilindi!");
   };
 
@@ -130,12 +125,12 @@ export default function News() {
     if (window.confirm("Haqiqatan ham ushbu yangilikni o'chirmoqchimisiz?")) {
       const updatedNews = newsList.filter(item => item.id !== id);
       setNewsList(updatedNews);
-      saveToFirebase(updatedNews); // <-- Firebase'ga saqlash
+      saveToFirebase(updatedNews);
     }
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 py-12">
+    <div className="max-w-[1400px] mx-auto px-6 py-12 font-sans">
       
       {/* Sarlavha va Admin tugmasi */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-gray-200 mb-8 flex flex-wrap justify-between items-center gap-4">
@@ -172,7 +167,7 @@ export default function News() {
                 placeholder="Admin parolini kiriting..."
                 value={adminPass}
                 onChange={(e) => setAdminPass(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                className="w-full px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm text-gray-900"
               />
               <div className="flex justify-end gap-2">
                 <button
@@ -210,7 +205,7 @@ export default function News() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
-                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none text-gray-900"
                 />
               </div>
 
@@ -219,7 +214,7 @@ export default function News() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none text-gray-900"
                 >
                   <option value="Tadbirlar">Tadbirlar</option>
                   <option value="IT va Innovatsiya">IT va Innovatsiya</option>
@@ -237,7 +232,7 @@ export default function News() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
-                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none text-gray-900"
               ></textarea>
             </div>
 
@@ -253,7 +248,7 @@ export default function News() {
 
             <button
               type="submit"
-              className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md shadow-orange-500/30 transition mt-2"
+              className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md transition mt-2"
             >
               Yangilikni e'lon qiliş
             </button>
@@ -289,6 +284,7 @@ export default function News() {
             {isAdmin && (
               <div className="p-4 border-t border-gray-100 bg-red-50 text-right">
                 <button
+                  key={`del-${item.id}`}
                   onClick={() => handleDeleteNews(item.id)}
                   className="px-4 py-2 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 transition"
                 >
