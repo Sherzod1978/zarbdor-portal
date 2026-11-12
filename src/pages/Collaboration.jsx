@@ -14,7 +14,7 @@ export default function Collaboration() {
   const [selectedClass, setSelectedClass] = useState(null);
   
   // Material qo'shish uchun state-lar
-  const [materialType, setMaterialType] = useState('announcement'); // 'announcement', 'video', 'interactive_test'
+  const [materialType, setMaterialType] = useState('announcement');
   const [title, setTitle] = useState('');
   const [contentUrl, setContentUrl] = useState('');
 
@@ -23,11 +23,17 @@ export default function Collaboration() {
   const [qText, setQText] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
   const [correctOption, setCorrectOption] = useState(0);
+  const [timeLimit, setTimeLimit] = useState(30); // Har bir savol uchun vaqt (sekund)
+  const [questionScore, setQuestionScore] = useState(10); // Savol bali
 
   // O'quvchi test yechishi uchun state-lar
   const [activeTest, setActiveTest] = useState(null);
+  const [currentQIndex, setCurrentQIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [testResult, setTestResult] = useState(null);
+  const [scoreEarned, setScoreEarned] = useState(0);
+  const [totalPossibleScore, setTotalPossibleScore] = useState(0);
+  const [testCompleted, setTestCompleted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(30);
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -37,6 +43,28 @@ export default function Collaboration() {
       fetchUserClasses();
     }
   }, [user]);
+
+  // Test ishlash jarayonidagi taymer
+  useEffect(() => {
+    if (!activeTest || testCompleted) return;
+
+    const currentQ = activeTest.questions[currentQIndex];
+    const limit = currentQ?.timeLimit || 30;
+    setTimeLeft(limit);
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleNextQuestion(true); // Vaqt tugasa avtomatik keyingi savolga o'tish
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [activeTest, currentQIndex, testCompleted]);
 
   const fetchUserClasses = async () => {
     try {
@@ -119,14 +147,16 @@ export default function Collaboration() {
     }
   };
 
-  // Testga savol qo'shish (o'qituvchi uchun)
+  // Testga savol qo'shish (vaqt va ballar bilan)
   const handleAddQuestionToTest = () => {
     if (!qText.trim()) return;
     const newQ = {
       id: Date.now(),
       question: qText,
       options: [...options],
-      correct: Number(correctOption)
+      correct: Number(correctOption),
+      timeLimit: Number(timeLimit),
+      score: Number(questionScore)
     };
     setTestQuestions([...testQuestions, newQ]);
     setQText('');
@@ -134,7 +164,6 @@ export default function Collaboration() {
     setCorrectOption(0);
   };
 
-  // Material yoki Interaktiv testni sinfga e'lon qilish
   const handleAddMaterial = async (e) => {
     e.preventDefault();
     if (!title.trim() || !selectedClass) return;
@@ -148,7 +177,7 @@ export default function Collaboration() {
       const classRef = doc(db, "classes", selectedClass.id);
       const newMaterial = {
         id: Date.now(),
-        type: materialType, // 'announcement', 'video', 'interactive_test'
+        type: materialType,
         title: title,
         url: contentUrl,
         questions: materialType === 'interactive_test' ? testQuestions : [],
@@ -164,25 +193,37 @@ export default function Collaboration() {
       setTitle('');
       setContentUrl('');
       setTestQuestions([]);
-      alert("Muvaffaqiyatli qo'shildi!");
+      alert("Material va test muvaffaqiyatli qo'shildi!");
     } catch (err) {
       console.error(err);
       alert("Qo'shishda xatolik yuz berdi.");
     }
   };
 
-  // O'quvchi test javoblarini tekshirishi
-  const handleCalculateTestScore = () => {
-    let score = 0;
-    activeTest.questions.forEach((q, idx) => {
-      if (selectedAnswers[idx] === q.correct) {
-        score += 1;
+  // O'quvchi keyingi savolga o'tganda yoki vaqt tugaganda
+  const handleNextQuestion = (isTimeOut = false) => {
+    const questions = activeTest.questions;
+    
+    // Ballni hisobga olish
+    let currentEarned = scoreEarned;
+    if (!isTimeOut) {
+      const currentQ = questions[currentQIndex];
+      const selectedOpt = selectedAnswers[currentQIndex];
+      if (selectedOpt === currentQ.correct) {
+        currentEarned += currentQ.score;
+        setScoreEarned(currentEarned);
       }
-    });
-    setTestResult({
-      score,
-      total: activeTest.questions.length
-    });
+    }
+
+    if (currentQIndex + 1 < questions.length) {
+      setCurrentQIndex(currentQIndex + 1);
+    } else {
+      // Test tugadi
+      let totalMax = 0;
+      questions.forEach(q => totalMax += q.score);
+      setTotalPossibleScore(totalMax);
+      setTestCompleted(true);
+    }
   };
 
   if (!user) {
@@ -199,58 +240,82 @@ export default function Collaboration() {
     );
   }
 
-  // Agar o'quvchi interaktiv testni yechayotgan bo'lsa
+  // Interaktiv test yechish oynasi (savolma-savol va taymer bilan)
   if (activeTest) {
+    const questions = activeTest.questions;
+
     return (
       <div className="max-w-3xl mx-auto px-6 py-10 font-sans">
         <button
-          onClick={() => { setActiveTest(null); setTestResult(null); setSelectedAnswers({}); }}
+          onClick={() => { setActiveTest(null); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); }}
           className="mb-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl text-sm transition"
         >
           ← Testlardan chiqish
         </button>
 
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 space-y-6">
-          <h2 className="text-2xl font-black text-gray-900">📝 {activeTest.title}</h2>
-
-          {testResult !== null && (
-            <div className="p-4 bg-orange-50 border border-orange-200 text-orange-900 rounded-xl text-center font-bold">
-              Sizning natijangiz: {testResult.score} / {testResult.total} ta to'g'ri javob! ({Math.round((testResult.score / testResult.total) * 100)}%)
-            </div>
-          )}
-
-          <div className="space-y-6">
-            {activeTest.questions.map((q, qIndex) => (
-              <div key={q.id} className="p-5 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
-                <h4 className="font-bold text-gray-900">{qIndex + 1}. {q.question}</h4>
-                <div className="space-y-2">
-                  {q.options.map((opt, optIndex) => (
-                    <label key={optIndex} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition ${
-                      selectedAnswers[qIndex] === optIndex ? 'bg-orange-100 border-orange-500 font-bold' : 'bg-white border-gray-200 hover:bg-gray-100'
-                    }`}>
-                      <input
-                        type="radio"
-                        name={`question-${qIndex}`}
-                        checked={selectedAnswers[qIndex] === optIndex}
-                        onChange={() => setSelectedAnswers({ ...selectedAnswers, [qIndex]: optIndex })}
-                        disabled={testResult !== null}
-                        className="text-orange-600"
-                      />
-                      <span className="text-sm text-gray-800">{opt}</span>
-                    </label>
-                  ))}
-                </div>
+          <div className="flex justify-between items-center border-b pb-4">
+            <h2 className="text-xl font-black text-gray-900">📝 {activeTest.title}</h2>
+            {!testCompleted && (
+              <div className="flex items-center gap-4">
+                <span className="text-xs font-bold bg-orange-100 text-orange-800 px-3 py-1 rounded-lg">
+                  Savol: {currentQIndex + 1} / {questions.length}
+                </span>
+                <span className={`text-xs font-bold px-3 py-1 rounded-lg ${timeLeft <= 5 ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-blue-100 text-blue-800'}`}>
+                  ⏱️ {timeLeft}s
+                </span>
               </div>
-            ))}
+            )}
           </div>
 
-          {testResult === null && (
-            <button
-              onClick={handleCalculateTestScore}
-              className="w-full py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg transition"
-            >
-              Natijani tekshirish
-            </button>
+          {testCompleted ? (
+            <div className="text-center space-y-4 py-8">
+              <div className="text-5xl">🏆</div>
+              <h3 className="text-2xl font-black text-gray-900">Test yakunlandi!</h3>
+              <p className="text-lg text-gray-700 font-semibold">
+                Sizning to'plagan balingiz: <span className="text-orange-600">{scoreEarned}</span> / {totalPossibleScore} ball
+              </p>
+              <button
+                onClick={() => { setActiveTest(null); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); }}
+                className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg transition"
+              >
+                Sinfga qaytish
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center text-xs font-bold text-gray-500">
+                <span>Ball: {questions[currentQIndex].score} ball</span>
+              </div>
+
+              <h3 className="text-lg font-bold text-gray-900">
+                {currentQIndex + 1}. {questions[currentQIndex].question}
+              </h3>
+
+              <div className="space-y-3">
+                {questions[currentQIndex].options.map((opt, optIndex) => (
+                  <label key={optIndex} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition ${
+                    selectedAnswers[currentQIndex] === optIndex ? 'bg-orange-100 border-orange-500 font-bold' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                  }`}>
+                    <input
+                      type="radio"
+                      name={`question-${currentQIndex}`}
+                      checked={selectedAnswers[currentQIndex] === optIndex}
+                      onChange={() => setSelectedAnswers({ ...selectedAnswers, [currentQIndex]: optIndex })}
+                      className="text-orange-600"
+                    />
+                    <span className="text-sm text-gray-800">{opt}</span>
+                  </label>
+                ))}
+              </div>
+
+              <button
+                onClick={() => handleNextQuestion(false)}
+                className="w-full py-3.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg transition"
+              >
+                {currentQIndex + 1 === questions.length ? "Testni yakunlash" : "Keyingi savol →"}
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -304,7 +369,7 @@ export default function Collaboration() {
                   <input
                     type="text"
                     required
-                    placeholder="Masalan: JavaScript asoslari bo'yicha test"
+                    placeholder="Masalan: Python asoslari testi"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm text-gray-900"
@@ -340,16 +405,39 @@ export default function Collaboration() {
                 </div>
               )}
 
-              {/* Interaktiv test savollarini qo'shish qismi */}
+              {/* Interaktiv test savollarini va sozlamalarini tuzish */}
               {materialType === 'interactive_test' && (
                 <div className="p-5 bg-orange-50/50 rounded-2xl border border-orange-200 space-y-4">
                   <h4 className="font-bold text-orange-900">Test savollarini tuzish (Jami qo'shilgan: {testQuestions.length} ta)</h4>
                   
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-gray-600 mb-1">Savol uchun vaqt (sekund)</label>
+                      <input
+                        type="number"
+                        min="5"
+                        value={timeLimit}
+                        onChange={(e) => setTimeLimit(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-sm text-gray-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase text-gray-600 mb-1">Savol bali</label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={questionScore}
+                        onChange={(e) => setQuestionScore(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-sm text-gray-900"
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-xs font-bold uppercase text-gray-600 mb-1">Savol matni</label>
                     <input
                       type="text"
-                      placeholder="Masalan: React qanday kutubxona?"
+                      placeholder="Masalan: Python'da o'zgaruvchi qanday yaratiladi?"
                       value={qText}
                       onChange={(e) => setQText(e.target.value)}
                       className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900"
@@ -449,7 +537,7 @@ export default function Collaboration() {
 
                     {item.type === 'interactive_test' && (
                       <button
-                        onClick={() => setActiveTest(item)}
+                        onClick={() => { setActiveTest(item); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); }}
                         className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-xl transition"
                       >
                         ✍️ Testni boshlash ({item.questions?.length || 0} ta savol)
