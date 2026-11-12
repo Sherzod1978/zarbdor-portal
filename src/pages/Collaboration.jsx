@@ -23,8 +23,8 @@ export default function Collaboration() {
   const [qText, setQText] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
   const [correctOption, setCorrectOption] = useState(0);
-  const [timeLimit, setTimeLimit] = useState(30); // Har bir savol uchun vaqt (sekund)
-  const [questionScore, setQuestionScore] = useState(10); // Savol bali
+  const [timeLimit, setTimeLimit] = useState(30);
+  const [questionScore, setQuestionScore] = useState(10);
 
   // O'quvchi test yechishi uchun state-lar
   const [activeTest, setActiveTest] = useState(null);
@@ -34,6 +34,7 @@ export default function Collaboration() {
   const [totalPossibleScore, setTotalPossibleScore] = useState(0);
   const [testCompleted, setTestCompleted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
+  const [showReview, setShowReview] = useState(false); // Xatolarni tahlil qilish rejimi
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -46,7 +47,7 @@ export default function Collaboration() {
 
   // Test ishlash jarayonidagi taymer
   useEffect(() => {
-    if (!activeTest || testCompleted) return;
+    if (!activeTest || testCompleted || showReview) return;
 
     const currentQ = activeTest.questions[currentQIndex];
     const limit = currentQ?.timeLimit || 30;
@@ -56,7 +57,7 @@ export default function Collaboration() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          handleNextQuestion(true); // Vaqt tugasa avtomatik keyingi savolga o'tish
+          handleNextQuestion(true);
           return 0;
         }
         return prev - 1;
@@ -64,7 +65,7 @@ export default function Collaboration() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [activeTest, currentQIndex, testCompleted]);
+  }, [activeTest, currentQIndex, testCompleted, showReview]);
 
   const fetchUserClasses = async () => {
     try {
@@ -147,7 +148,7 @@ export default function Collaboration() {
     }
   };
 
-  // Testga savol qo'shish (vaqt va ballar bilan)
+  // Test savolini qo'shish
   const handleAddQuestionToTest = () => {
     if (!qText.trim()) return;
     const newQ = {
@@ -162,6 +163,11 @@ export default function Collaboration() {
     setQText('');
     setOptions(['', '', '', '']);
     setCorrectOption(0);
+  };
+
+  // Savolni o'chirish / tahrirlash uchun ro'yxatdan olib tashlash
+  const handleDeleteQuestion = (id) => {
+    setTestQuestions(testQuestions.filter(q => q.id !== id));
   };
 
   const handleAddMaterial = async (e) => {
@@ -200,11 +206,10 @@ export default function Collaboration() {
     }
   };
 
-  // O'quvchi keyingi savolga o'tganda yoki vaqt tugaganda
-  const handleNextQuestion = (isTimeOut = false) => {
+  // Test natijasini Firestore'ga saqlash va keyingi savolga o'tish
+  const handleNextQuestion = async (isTimeOut = false) => {
     const questions = activeTest.questions;
     
-    // Ballni hisobga olish
     let currentEarned = scoreEarned;
     if (!isTimeOut) {
       const currentQ = questions[currentQIndex];
@@ -218,11 +223,29 @@ export default function Collaboration() {
     if (currentQIndex + 1 < questions.length) {
       setCurrentQIndex(currentQIndex + 1);
     } else {
-      // Test tugadi
       let totalMax = 0;
       questions.forEach(q => totalMax += q.score);
       setTotalPossibleScore(totalMax);
       setTestCompleted(true);
+
+      // Natijani bazaga (sinfga) saqlash
+      try {
+        const classRef = doc(db, "classes", selectedClass.id);
+        const resultRecord = {
+          studentUsername: user.username,
+          studentName: user.fullName || user.username,
+          testTitle: activeTest.title,
+          score: currentEarned,
+          maxScore: totalMax,
+          date: new Date().toLocaleString()
+        };
+
+        await updateDoc(classRef, {
+          testResults: arrayUnion(resultRecord)
+        });
+      } catch (err) {
+        console.error("Natijani saqlashda xatolik:", err);
+      }
     }
   };
 
@@ -240,14 +263,14 @@ export default function Collaboration() {
     );
   }
 
-  // Interaktiv test yechish oynasi (savolma-savol va taymer bilan)
+  // Interaktiv test yechish va xatolarni tahlil qilish (Review) oynasi
   if (activeTest) {
     const questions = activeTest.questions;
 
     return (
       <div className="max-w-3xl mx-auto px-6 py-10 font-sans">
         <button
-          onClick={() => { setActiveTest(null); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); }}
+          onClick={() => { setActiveTest(null); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); setShowReview(false); }}
           className="mb-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl text-sm transition"
         >
           ← Testlardan chiqish
@@ -269,18 +292,62 @@ export default function Collaboration() {
           </div>
 
           {testCompleted ? (
-            <div className="text-center space-y-4 py-8">
-              <div className="text-5xl">🏆</div>
-              <h3 className="text-2xl font-black text-gray-900">Test yakunlandi!</h3>
-              <p className="text-lg text-gray-700 font-semibold">
-                Sizning to'plagan balingiz: <span className="text-orange-600">{scoreEarned}</span> / {totalPossibleScore} ball
-              </p>
-              <button
-                onClick={() => { setActiveTest(null); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); }}
-                className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-lg transition"
-              >
-                Sinfga qaytish
-              </button>
+            <div className="space-y-6 py-4">
+              <div className="text-center space-y-2">
+                <div className="text-5xl">🏆</div>
+                <h3 className="text-2xl font-black text-gray-900">Test yakunlandi!</h3>
+                <p className="text-lg text-gray-700 font-semibold">
+                  Sizning to'plagan balingiz: <span className="text-orange-600">{scoreEarned}</span> / {totalPossibleScore} ball
+                </p>
+                <p className="text-xs text-green-600 font-bold">Natijangiz o'qituvchiga muvaffaqiyatli yuborildi!</p>
+              </div>
+
+              {!showReview ? (
+                <button
+                  onClick={() => setShowReview(true)}
+                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition"
+                >
+                  🔍 Xatolarni tahlil qilish (Review)
+                </button>
+              ) : (
+                <div className="space-y-6 pt-4 border-t">
+                  <h4 className="font-bold text-gray-900 text-lg">Javoblar tahlili:</h4>
+                  {questions.map((q, idx) => {
+                    const studentAns = selectedAnswers[idx];
+                    const isCorrect = studentAns === q.correct;
+                    return (
+                      <div key={q.id} className={`p-4 rounded-xl border ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                        <p className="font-bold text-gray-900 mb-2">{idx + 1}. {q.question}</p>
+                        <p className="text-xs mb-1">
+                          Sizning javobingiz: <span className={`font-bold ${isCorrect ? 'text-green-700' : 'text-red-600'}`}>
+                            {studentAns !== undefined ? q.options[studentAns] : "Javob berilmadi"} {isCorrect ? '✅' : '❌'}
+                          </span>
+                        </p>
+                        {!isCorrect && (
+                          <p className="text-xs text-green-700 font-bold">
+                            To'g'ri javob: {q.options[q.correct]}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                  <button
+                    onClick={() => { setActiveTest(null); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); setShowReview(false); }}
+                    className="w-full py-3.5 bg-gray-900 hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg transition"
+                  >
+                    Sinf sahifasiga qaytish
+                  </button>
+                </div>
+              )}
+
+              {!showReview && (
+                <button
+                  onClick={() => { setActiveTest(null); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); setShowReview(false); }}
+                  className="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl transition"
+                >
+                  Sinfga qaytish
+                </button>
+              )}
             </div>
           ) : (
             <div className="space-y-6">
@@ -405,14 +472,33 @@ export default function Collaboration() {
                 </div>
               )}
 
-              {/* Interaktiv test savollarini va sozlamalarini tuzish */}
+              {/* Interaktiv test savollarini tuzish va tahrirlash */}
               {materialType === 'interactive_test' && (
                 <div className="p-5 bg-orange-50/50 rounded-2xl border border-orange-200 space-y-4">
-                  <h4 className="font-bold text-orange-900">Test savollarini tuzish (Jami qo'shilgan: {testQuestions.length} ta)</h4>
+                  <h4 className="font-bold text-orange-900">Test savollarini tuzish va tahrirlash (Jami: {testQuestions.length} ta)</h4>
                   
+                  {/* Qo'shilgan savollar ro'yxati (tahrirlash uchun o'chirish imkoniyati bilan) */}
+                  {testQuestions.length > 0 && (
+                    <div className="space-y-2 mb-4">
+                      <p className="text-xs font-bold text-gray-700">Qo'shilgan savollar:</p>
+                      {testQuestions.map((q, idx) => (
+                        <div key={q.id} className="flex justify-between items-center p-3 bg-white rounded-xl border text-xs">
+                          <span>{idx + 1}. {q.question} ({q.score} ball, {q.timeLimit}s)</span>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteQuestion(q.id)}
+                            className="text-red-600 font-bold hover:underline"
+                          >
+                            O'chirish
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-600 mb-1">Savol uchun vaqt (sekund)</label>
+                      <label className="block text-xs font-bold uppercase text-gray-600 mb-1">Savol vaqti (sekund)</label>
                       <input
                         type="number"
                         min="5"
@@ -482,7 +568,7 @@ export default function Collaboration() {
                     onClick={handleAddQuestionToTest}
                     className="px-4 py-2 bg-gray-900 hover:bg-orange-600 text-white font-bold rounded-xl text-xs transition"
                   >
-                    + Savolni qo'shish
+                    + Savolni ro'yxatga qo'shish
                   </button>
                 </div>
               )}
@@ -497,7 +583,7 @@ export default function Collaboration() {
           </div>
         )}
 
-        {/* Materiallar va O'quvchilar */}
+        {/* Materiallar va O'quvchilar / Natijalar */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
           <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
@@ -537,7 +623,7 @@ export default function Collaboration() {
 
                     {item.type === 'interactive_test' && (
                       <button
-                        onClick={() => { setActiveTest(item); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); }}
+                        onClick={() => { setActiveTest(item); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); setShowReview(false); }}
                         className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-xl transition"
                       >
                         ✍️ Testni boshlash ({item.questions?.length || 0} ta savol)
@@ -549,20 +635,45 @@ export default function Collaboration() {
             )}
           </div>
 
-          <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">👥 Sinf o'quvchilari ({selectedClass.students?.length || 0})</h3>
-            {(!selectedClass.students || selectedClass.students.length === 0) ? (
-              <p className="text-sm text-gray-500">Hozircha o'quvchilar qo'shilmagan.</p>
-            ) : (
-              <ul className="space-y-2">
-                {selectedClass.students.map((st, index) => (
-                  <li key={index} className="px-4 py-2.5 bg-gray-50 rounded-xl text-sm font-semibold text-gray-700 border border-gray-100 flex items-center justify-between">
-                    <span>{index + 1}. {st}</span>
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-lg">O'quvchi</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+          <div className="space-y-8">
+            {/* O'quvchilar ro'yxati */}
+            <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">👥 Sinf o'quvchilari ({selectedClass.students?.length || 0})</h3>
+              {(!selectedClass.students || selectedClass.students.length === 0) ? (
+                <p className="text-sm text-gray-500">Hozircha o'quvchilar qo'shilmagan.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {selectedClass.students.map((st, index) => (
+                    <li key={index} className="px-4 py-2.5 bg-gray-50 rounded-xl text-sm font-semibold text-gray-700 border border-gray-100 flex items-center justify-between">
+                      <span>{index + 1}. {st}</span>
+                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-lg">O'quvchi</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Test natijalari (O'qituvchi va o'quvchilar ko'rishi uchun) */}
+            <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">📊 Test Natijalari</h3>
+              {(!selectedClass.testResults || selectedClass.testResults.length === 0) ? (
+                <p className="text-sm text-gray-500">Hozircha topshirilgan test natijalari yo'q.</p>
+              ) : (
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {selectedClass.testResults.map((res, idx) => (
+                    <div key={idx} className="p-3 bg-gray-50 rounded-xl border flex justify-between items-center text-xs">
+                      <div>
+                        <p className="font-bold text-gray-900">{res.studentName} ({res.testTitle})</p>
+                        <p className="text-gray-400">{res.date}</p>
+                      </div>
+                      <span className="font-black text-orange-600 bg-orange-100 px-2 py-1 rounded-lg">
+                        {res.score} / {res.maxScore} ball
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
         </div>
