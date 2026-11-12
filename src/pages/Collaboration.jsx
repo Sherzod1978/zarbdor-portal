@@ -18,13 +18,16 @@ export default function Collaboration() {
   const [title, setTitle] = useState('');
   const [contentUrl, setContentUrl] = useState('');
 
-  // Interaktiv test yaratish uchun state-lar
+  // Interaktiv test yaratish/tahrirlash uchun state-lar
   const [testQuestions, setTestQuestions] = useState([]);
   const [qText, setQText] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
   const [correctOption, setCorrectOption] = useState(0);
   const [timeLimit, setTimeLimit] = useState(30);
   const [questionScore, setQuestionScore] = useState(10);
+  
+  // Mavjud testni tahrirlash rejimi
+  const [editingTestId, setEditingTestId] = useState(null);
 
   // O'quvchi test yechishi uchun state-lar
   const [activeTest, setActiveTest] = useState(null);
@@ -34,7 +37,7 @@ export default function Collaboration() {
   const [totalPossibleScore, setTotalPossibleScore] = useState(0);
   const [testCompleted, setTestCompleted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(30);
-  const [showReview, setShowReview] = useState(false); // Xatolarni tahlil qilish rejimi
+  const [showReview, setShowReview] = useState(false);
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -82,6 +85,11 @@ export default function Collaboration() {
         list.push({ id: docSnap.id, ...docSnap.data() });
       });
       setMyClasses(list);
+      // Agar tanlangan sinf bo'lsa, uning ma'lumotlarini ham yangilash
+      if (selectedClass) {
+        const updated = list.find(c => c.id === selectedClass.id);
+        if (updated) setSelectedClass(updated);
+      }
     } catch (err) {
       console.error("Sinflarni olishda xatolik:", err);
     }
@@ -102,6 +110,7 @@ export default function Collaboration() {
         teacherFullName: user.fullName,
         students: [],
         materials: [],
+        testResults: [],
         createdAt: new Date()
       });
 
@@ -148,7 +157,6 @@ export default function Collaboration() {
     }
   };
 
-  // Test savolini qo'shish
   const handleAddQuestionToTest = () => {
     if (!qText.trim()) return;
     const newQ = {
@@ -165,19 +173,62 @@ export default function Collaboration() {
     setCorrectOption(0);
   };
 
-  // Savolni o'chirish / tahrirlash uchun ro'yxatdan olib tashlash
-  const handleDeleteQuestion = (id) => {
+  const handleDeleteQuestionFromBuffer = (id) => {
     setTestQuestions(testQuestions.filter(q => q.id !== id));
   };
 
-  const handleAddMaterial = async (e) => {
+  // Testni saqlash yoki tahrirlanganini bazaga yangilash
+  const handleSaveTestMaterial = async (e) => {
     e.preventDefault();
     if (!title.trim() || !selectedClass) return;
 
-    if (materialType === 'interactive_test' && testQuestions.length === 0) {
+    if (testQuestions.length === 0) {
       alert("Iltimos, kamida bitta savol qo'shing!");
       return;
     }
+
+    try {
+      const classRef = doc(db, "classes", selectedClass.id);
+      let updatedMaterials = [...(selectedClass.materials || [])];
+
+      if (editingTestId) {
+        // Mavjud testni yangilash (tahrirlash)
+        updatedMaterials = updatedMaterials.map(mat => {
+          if (mat.id === editingTestId) {
+            return { ...mat, title: title, questions: testQuestions };
+          }
+          return mat;
+        });
+      } else {
+        // Yangi test qo'shish
+        const newMaterial = {
+          id: Date.now(),
+          type: 'interactive_test',
+          title: title,
+          url: '',
+          questions: testQuestions,
+          date: new Date().toLocaleDateString()
+        };
+        updatedMaterials.push(newMaterial);
+      }
+
+      await updateDoc(classRef, { materials: updatedMaterials });
+
+      setSelectedClass({ ...selectedClass, materials: updatedMaterials });
+      setTitle('');
+      setTestQuestions([]);
+      setEditingTestId(null);
+      alert("Test muvaffaqiyatli saqlandi!");
+    } catch (err) {
+      console.error(err);
+      alert("Saqlashda xatolik yuz berdi.");
+    }
+  };
+
+  // Oddiy material (E'lon yoki Video) qo'shish
+  const handleAddSimpleMaterial = async (e) => {
+    e.preventDefault();
+    if (!title.trim() || !contentUrl.trim() || !selectedClass) return;
 
     try {
       const classRef = doc(db, "classes", selectedClass.id);
@@ -186,27 +237,44 @@ export default function Collaboration() {
         type: materialType,
         title: title,
         url: contentUrl,
-        questions: materialType === 'interactive_test' ? testQuestions : [],
+        questions: [],
         date: new Date().toLocaleDateString()
       };
 
-      await updateDoc(classRef, {
-        materials: arrayUnion(newMaterial)
-      });
-
       const updatedMaterials = [...(selectedClass.materials || []), newMaterial];
+      await updateDoc(classRef, { materials: updatedMaterials });
+
       setSelectedClass({ ...selectedClass, materials: updatedMaterials });
       setTitle('');
       setContentUrl('');
-      setTestQuestions([]);
-      alert("Material va test muvaffaqiyatli qo'shildi!");
+      alert("Material qo'shildi!");
     } catch (err) {
       console.error(err);
-      alert("Qo'shishda xatolik yuz berdi.");
+      alert("Xatolik yuz berdi.");
     }
   };
 
-  // Test natijasini Firestore'ga saqlash va keyingi savolga o'tish
+  // Testni tahrirlash rejimiga o'tkazish
+  const handleStartEditTest = (mat) => {
+    setEditingTestId(mat.id);
+    setTitle(mat.title);
+    setTestQuestions(mat.questions || []);
+    setMaterialType('interactive_test');
+  };
+
+  // Materialni o'chirish
+  const handleDeleteMaterial = async (matId) => {
+    if (!window.confirm("Haqiqatan ham ushbu materialni o'chirmoqchimisiz?")) return;
+    try {
+      const classRef = doc(db, "classes", selectedClass.id);
+      const updatedMaterials = selectedClass.materials.filter(m => m.id !== matId);
+      await updateDoc(classRef, { materials: updatedMaterials });
+      setSelectedClass({ ...selectedClass, materials: updatedMaterials });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleNextQuestion = async (isTimeOut = false) => {
     const questions = activeTest.questions;
     
@@ -228,7 +296,6 @@ export default function Collaboration() {
       setTotalPossibleScore(totalMax);
       setTestCompleted(true);
 
-      // Natijani bazaga (sinfga) saqlash
       try {
         const classRef = doc(db, "classes", selectedClass.id);
         const resultRecord = {
@@ -243,6 +310,7 @@ export default function Collaboration() {
         await updateDoc(classRef, {
           testResults: arrayUnion(resultRecord)
         });
+        fetchUserClasses();
       } catch (err) {
         console.error("Natijani saqlashda xatolik:", err);
       }
@@ -263,7 +331,6 @@ export default function Collaboration() {
     );
   }
 
-  // Interaktiv test yechish va xatolarni tahlil qilish (Review) oynasi
   if (activeTest) {
     const questions = activeTest.questions;
 
@@ -299,7 +366,7 @@ export default function Collaboration() {
                 <p className="text-lg text-gray-700 font-semibold">
                   Sizning to'plagan balingiz: <span className="text-orange-600">{scoreEarned}</span> / {totalPossibleScore} ball
                 </p>
-                <p className="text-xs text-green-600 font-bold">Natijangiz o'qituvchiga muvaffaqiyatli yuborildi!</p>
+                <p className="text-xs text-green-600 font-bold">Natijangiz o'qituvchiga yuborildi!</p>
               </div>
 
               {!showReview ? (
@@ -411,82 +478,106 @@ export default function Collaboration() {
           </div>
         </div>
 
-        {/* O'qituvchi uchun material qo'shish */}
+        {/* O'qituvchi uchun material / test qo'shish va tahrirlash */}
         {user.role === 'teacher' && (
           <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100 mb-8 space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">📚 Sinfga material yoki interaktiv test qo'shish</h3>
-            <form onSubmit={handleAddMaterial} className="space-y-4">
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-600 mb-2">Material turi</label>
-                  <select
-                    value={materialType}
-                    onChange={(e) => setMaterialType(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm bg-white text-gray-900"
-                  >
-                    <option value="announcement">📢 E'lon / Matnli topshiriq</option>
-                    <option value="video">🎥 Videodars havolasi</option>
-                    <option value="interactive_test">📝 Sayt ichidagi interaktiv test</option>
-                  </select>
+            <h3 className="text-lg font-bold text-gray-900">
+              {editingTestId ? "✏️ Testni tahrirlash rejimi" : "📚 Sinfga material yoki interaktiv test qo'shish"}
+            </h3>
+            
+            {/* Oddiy materiallar uchun forma */}
+            {materialType !== 'interactive_test' ? (
+              <form onSubmit={handleAddSimpleMaterial} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-600 mb-2">Material turi</label>
+                    <select
+                      value={materialType}
+                      onChange={(e) => setMaterialType(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm bg-white text-gray-900"
+                    >
+                      <option value="announcement">📢 E'lon / Matnli topshiriq</option>
+                      <option value="video">🎥 Videodars havolasi</option>
+                      <option value="interactive_test">📝 Sayt ichidagi interaktiv test</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-600 mb-2">Sarlavha yoki Mavzu</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Mavzu nomini kiriting..."
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm text-gray-900"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase text-gray-600 mb-2">Test yoki Mavzu nomi</label>
+                  <label className="block text-xs font-bold uppercase text-gray-600 mb-2">
+                    {materialType === 'video' ? 'YouTube video havolasi (URL)' : 'E\'lon matni'}
+                  </label>
                   <input
-                    type="text"
+                    type={materialType === 'video' ? 'url' : 'text'}
                     required
-                    placeholder="Masalan: Python asoslari testi"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm text-gray-900"
-                  />
-                </div>
-              </div>
-
-              {materialType === 'video' && (
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-600 mb-2">YouTube video havolasi (URL)</label>
-                  <input
-                    type="url"
-                    required
-                    placeholder="https://youtube.com/..."
+                    placeholder={materialType === 'video' ? 'https://youtube.com/...' : 'Matnni kiriting...'}
                     value={contentUrl}
                     onChange={(e) => setContentUrl(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm text-gray-900"
                   />
                 </div>
-              )}
 
-              {materialType === 'announcement' && (
-                <div>
-                  <label className="block text-xs font-bold uppercase text-gray-600 mb-2">E'lon matni</label>
-                  <textarea
-                    rows="3"
-                    required
-                    placeholder="E'lon tafsilotlarini yozing..."
-                    value={contentUrl}
-                    onChange={(e) => setContentUrl(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm text-gray-900"
-                  />
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition shadow"
+                >
+                  Materialni e'lon qilish
+                </button>
+              </form>
+            ) : (
+              /* Interaktiv test yaratish va tahrirlash formasi */
+              <form onSubmit={handleSaveTestMaterial} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-600 mb-2">Material turi</label>
+                    <select
+                      value={materialType}
+                      onChange={(e) => {
+                        setMaterialType(e.target.value);
+                        if(e.target.value !== 'interactive_test') setEditingTestId(null);
+                      }}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm bg-white text-gray-900"
+                    >
+                      <option value="interactive_test">📝 Sayt ichidagi interaktiv test</option>
+                      <option value="announcement">📢 E'lon / Matnli topshiriq</option>
+                      <option value="video">🎥 Videodars havolasi</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-600 mb-2">Test Nomi</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Masalan: 1-mavzu testi"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm text-gray-900"
+                    />
+                  </div>
                 </div>
-              )}
 
-              {/* Interaktiv test savollarini tuzish va tahrirlash */}
-              {materialType === 'interactive_test' && (
                 <div className="p-5 bg-orange-50/50 rounded-2xl border border-orange-200 space-y-4">
-                  <h4 className="font-bold text-orange-900">Test savollarini tuzish va tahrirlash (Jami: {testQuestions.length} ta)</h4>
+                  <h4 className="font-bold text-orange-900">Savollar ro'yxati (Jami: {testQuestions.length} ta)</h4>
                   
-                  {/* Qo'shilgan savollar ro'yxati (tahrirlash uchun o'chirish imkoniyati bilan) */}
                   {testQuestions.length > 0 && (
                     <div className="space-y-2 mb-4">
-                      <p className="text-xs font-bold text-gray-700">Qo'shilgan savollar:</p>
                       {testQuestions.map((q, idx) => (
                         <div key={q.id} className="flex justify-between items-center p-3 bg-white rounded-xl border text-xs">
                           <span>{idx + 1}. {q.question} ({q.score} ball, {q.timeLimit}s)</span>
                           <button
                             type="button"
-                            onClick={() => handleDeleteQuestion(q.id)}
+                            onClick={() => handleDeleteQuestionFromBuffer(q.id)}
                             className="text-red-600 font-bold hover:underline"
                           >
                             O'chirish
@@ -498,7 +589,7 @@ export default function Collaboration() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-600 mb-1">Savol vaqti (sekund)</label>
+                      <label className="block text-xs font-bold uppercase text-gray-600 mb-1">Vaqt (sekund)</label>
                       <input
                         type="number"
                         min="5"
@@ -508,7 +599,7 @@ export default function Collaboration() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase text-gray-600 mb-1">Savol bali</label>
+                      <label className="block text-xs font-bold uppercase text-gray-600 mb-1">Ball</label>
                       <input
                         type="number"
                         min="1"
@@ -523,7 +614,7 @@ export default function Collaboration() {
                     <label className="block text-xs font-bold uppercase text-gray-600 mb-1">Savol matni</label>
                     <input
                       type="text"
-                      placeholder="Masalan: Python'da o'zgaruvchi qanday yaratiladi?"
+                      placeholder="Savolni kiriting..."
                       value={qText}
                       onChange={(e) => setQText(e.target.value)}
                       className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-xl text-sm text-gray-900"
@@ -568,22 +659,33 @@ export default function Collaboration() {
                     onClick={handleAddQuestionToTest}
                     className="px-4 py-2 bg-gray-900 hover:bg-orange-600 text-white font-bold rounded-xl text-xs transition"
                   >
-                    + Savolni ro'yxatga qo'shish
+                    + Savolni qo'shish
                   </button>
                 </div>
-              )}
 
-              <button
-                type="submit"
-                className="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition shadow"
-              >
-                Materialni e'lon qilish
-              </button>
-            </form>
+                <div className="flex gap-3">
+                  <button
+                    type="submit"
+                    className="flex-1 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition shadow"
+                  >
+                    {editingTestId ? "Test o'zgarishlarini saqlash" : "Testni e'lon qilish"}
+                  </button>
+                  {editingTestId && (
+                    <button
+                      type="button"
+                      onClick={() => { setEditingTestId(null); setTitle(''); setTestQuestions([]); }}
+                      className="px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded-xl text-sm transition"
+                    >
+                      Bekor qilish
+                    </button>
+                  )}
+                </div>
+              </form>
+            )}
           </div>
         )}
 
-        {/* Materiallar va O'quvchilar / Natijalar */}
+        {/* Materiallar va Natijalar */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
           <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
@@ -622,12 +724,33 @@ export default function Collaboration() {
                     )}
 
                     {item.type === 'interactive_test' && (
-                      <button
-                        onClick={() => { setActiveTest(item); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); setShowReview(false); }}
-                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-xl transition"
-                      >
-                        ✍️ Testni boshlash ({item.questions?.length || 0} ta savol)
-                      </button>
+                      <div className="flex gap-2 pt-2">
+                        <button
+                          onClick={() => { setActiveTest(item); setCurrentQIndex(0); setSelectedAnswers({}); setScoreEarned(0); setTestCompleted(false); setShowReview(false); }}
+                          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-xl transition"
+                        >
+                          ✍️ Testni ishlash ({item.questions?.length || 0} ta savol)
+                        </button>
+                        {user.role === 'teacher' && (
+                          <button
+                            onClick={() => handleStartEditTest(item)}
+                            className="px-3 py-2 bg-gray-800 hover:bg-gray-900 text-white text-xs font-bold rounded-xl transition"
+                          >
+                            ✏️ Tahrirlash
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {user.role === 'teacher' && (
+                      <div className="text-right pt-1">
+                        <button
+                          onClick={() => handleDeleteMaterial(item.id)}
+                          className="text-xs text-red-600 font-bold hover:underline"
+                        >
+                          O'chirish
+                        </button>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -636,7 +759,6 @@ export default function Collaboration() {
           </div>
 
           <div className="space-y-8">
-            {/* O'quvchilar ro'yxati */}
             <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
               <h3 className="text-lg font-bold text-gray-900 mb-4">👥 Sinf o'quvchilari ({selectedClass.students?.length || 0})</h3>
               {(!selectedClass.students || selectedClass.students.length === 0) ? (
@@ -653,7 +775,6 @@ export default function Collaboration() {
               )}
             </div>
 
-            {/* Test natijalari (O'qituvchi va o'quvchilar ko'rishi uchun) */}
             <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
               <h3 className="text-lg font-bold text-gray-900 mb-4">📊 Test Natijalari</h3>
               {(!selectedClass.testResults || selectedClass.testResults.length === 0) ? (
