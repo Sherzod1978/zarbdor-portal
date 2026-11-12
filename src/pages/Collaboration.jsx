@@ -113,7 +113,17 @@ export default function Collaboration() {
       setLoading(false);
     }
   };
-
+// O'quvchining rolini avtomatik to'g'rilash yoki o'chirish uchun funksiya
+const fixUserRole = async (targetUsername) => {
+  try {
+    const userRef = doc(db, "users", targetUsername);
+    await updateDoc(userRef, { role: "student" });
+    alert(`${targetUsername} ning roli "student" (o'quvchi) ga o'zgartirildi!`);
+  } catch (err) {
+    console.error(err);
+    alert("Xatolik yuz berdi.");
+  }
+};
   if (!user) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-6">
