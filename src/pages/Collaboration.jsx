@@ -26,7 +26,8 @@ export default function Collaboration() {
   const [timeLimit, setTimeLimit] = useState(30);
   const [questionScore, setQuestionScore] = useState(10);
   
-  // Mavjud testni tahrirlash rejimi
+  // Mavjud savolni yoki testni tahrirlash state-lari
+  const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [editingTestId, setEditingTestId] = useState(null);
 
   // O'quvchi test yechishi uchun state-lar
@@ -48,7 +49,6 @@ export default function Collaboration() {
     }
   }, [user]);
 
-  // Test ishlash jarayonidagi taymer
   useEffect(() => {
     if (!activeTest || testCompleted || showReview) return;
 
@@ -85,7 +85,6 @@ export default function Collaboration() {
         list.push({ id: docSnap.id, ...docSnap.data() });
       });
       setMyClasses(list);
-      // Agar tanlangan sinf bo'lsa, uning ma'lumotlarini ham yangilash
       if (selectedClass) {
         const updated = list.find(c => c.id === selectedClass.id);
         if (updated) setSelectedClass(updated);
@@ -157,27 +156,65 @@ export default function Collaboration() {
     }
   };
 
-  const handleAddQuestionToTest = () => {
+  // Savolni qo'shish yoki tahrirni saqlash
+  const handleAddOrUpdateQuestion = () => {
     if (!qText.trim()) return;
-    const newQ = {
-      id: Date.now(),
-      question: qText,
-      options: [...options],
-      correct: Number(correctOption),
-      timeLimit: Number(timeLimit),
-      score: Number(questionScore)
-    };
-    setTestQuestions([...testQuestions, newQ]);
+
+    if (editingQuestionId) {
+      // Mavjud savolni yangilash
+      setTestQuestions(testQuestions.map(q => {
+        if (q.id === editingQuestionId) {
+          return {
+            ...q,
+            question: qText,
+            options: [...options],
+            correct: Number(correctOption),
+            timeLimit: Number(timeLimit),
+            score: Number(questionScore)
+          };
+        }
+        return q;
+      }));
+      setEditingQuestionId(null);
+    } else {
+      // Yangi savol qo'shish
+      const newQ = {
+        id: Date.now(),
+        question: qText,
+        options: [...options],
+        correct: Number(correctOption),
+        timeLimit: Number(timeLimit),
+        score: Number(questionScore)
+      };
+      setTestQuestions([...testQuestions, newQ]);
+    }
+
     setQText('');
     setOptions(['', '', '', '']);
     setCorrectOption(0);
+    setTimeLimit(30);
+    setQuestionScore(10);
+  };
+
+  // Savolni tahrirlash uchun inputlarga chiqarish (qalamchani bosganda)
+  const handleStartEditQuestion = (q) => {
+    setEditingQuestionId(q.id);
+    setQText(q.question);
+    setOptions([...q.options]);
+    setCorrectOption(q.correct);
+    setTimeLimit(q.timeLimit || 30);
+    setQuestionScore(q.score || 10);
   };
 
   const handleDeleteQuestionFromBuffer = (id) => {
     setTestQuestions(testQuestions.filter(q => q.id !== id));
+    if (editingQuestionId === id) {
+      setEditingQuestionId(null);
+      setQText('');
+      setOptions(['', '', '', '']);
+    }
   };
 
-  // Testni saqlash yoki tahrirlanganini bazaga yangilash
   const handleSaveTestMaterial = async (e) => {
     e.preventDefault();
     if (!title.trim() || !selectedClass) return;
@@ -192,7 +229,6 @@ export default function Collaboration() {
       let updatedMaterials = [...(selectedClass.materials || [])];
 
       if (editingTestId) {
-        // Mavjud testni yangilash (tahrirlash)
         updatedMaterials = updatedMaterials.map(mat => {
           if (mat.id === editingTestId) {
             return { ...mat, title: title, questions: testQuestions };
@@ -200,7 +236,6 @@ export default function Collaboration() {
           return mat;
         });
       } else {
-        // Yangi test qo'shish
         const newMaterial = {
           id: Date.now(),
           type: 'interactive_test',
@@ -218,6 +253,7 @@ export default function Collaboration() {
       setTitle('');
       setTestQuestions([]);
       setEditingTestId(null);
+      setEditingQuestionId(null);
       alert("Test muvaffaqiyatli saqlandi!");
     } catch (err) {
       console.error(err);
@@ -225,7 +261,6 @@ export default function Collaboration() {
     }
   };
 
-  // Oddiy material (E'lon yoki Video) qo'shish
   const handleAddSimpleMaterial = async (e) => {
     e.preventDefault();
     if (!title.trim() || !contentUrl.trim() || !selectedClass) return;
@@ -254,7 +289,6 @@ export default function Collaboration() {
     }
   };
 
-  // Testni tahrirlash rejimiga o'tkazish
   const handleStartEditTest = (mat) => {
     setEditingTestId(mat.id);
     setTitle(mat.title);
@@ -262,7 +296,6 @@ export default function Collaboration() {
     setMaterialType('interactive_test');
   };
 
-  // Materialni o'chirish
   const handleDeleteMaterial = async (matId) => {
     if (!window.confirm("Haqiqatan ham ushbu materialni o'chirmoqchimisiz?")) return;
     try {
@@ -485,7 +518,6 @@ export default function Collaboration() {
               {editingTestId ? "✏️ Testni tahrirlash rejimi" : "📚 Sinfga material yoki interaktiv test qo'shish"}
             </h3>
             
-            {/* Oddiy materiallar uchun forma */}
             {materialType !== 'interactive_test' ? (
               <form onSubmit={handleAddSimpleMaterial} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -536,7 +568,6 @@ export default function Collaboration() {
                 </button>
               </form>
             ) : (
-              /* Interaktiv test yaratish va tahrirlash formasi */
               <form onSubmit={handleSaveTestMaterial} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -570,18 +601,30 @@ export default function Collaboration() {
                 <div className="p-5 bg-orange-50/50 rounded-2xl border border-orange-200 space-y-4">
                   <h4 className="font-bold text-orange-900">Savollar ro'yxati (Jami: {testQuestions.length} ta)</h4>
                   
+                  {/* Savollar ro'yxati va har birining yonida Tahrirlash (✏️) hamda O'chirish tugmalari */}
                   {testQuestions.length > 0 && (
                     <div className="space-y-2 mb-4">
                       {testQuestions.map((q, idx) => (
                         <div key={q.id} className="flex justify-between items-center p-3 bg-white rounded-xl border text-xs">
                           <span>{idx + 1}. {q.question} ({q.score} ball, {q.timeLimit}s)</span>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteQuestionFromBuffer(q.id)}
-                            className="text-red-600 font-bold hover:underline"
-                          >
-                            O'chirish
-                          </button>
+                          <div className="flex gap-3">
+                            <button
+                              type="button"
+                              onClick={() => handleStartEditQuestion(q)}
+                              className="text-blue-600 font-bold hover:underline"
+                              title="Tahrirlash"
+                            >
+                              ✏️ Tahrirlash
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteQuestionFromBuffer(q.id)}
+                              className="text-red-600 font-bold hover:underline"
+                              title="O'chirish"
+                            >
+                              O'chirish
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -656,10 +699,10 @@ export default function Collaboration() {
 
                   <button
                     type="button"
-                    onClick={handleAddQuestionToTest}
+                    onClick={handleAddOrUpdateQuestion}
                     className="px-4 py-2 bg-gray-900 hover:bg-orange-600 text-white font-bold rounded-xl text-xs transition"
                   >
-                    + Savolni qo'shish
+                    {editingQuestionId ? "Savol o'zgarishlarini saqlash" : "+ Savolni qo'shish"}
                   </button>
                 </div>
 
@@ -668,12 +711,12 @@ export default function Collaboration() {
                     type="submit"
                     className="flex-1 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition shadow"
                   >
-                    {editingTestId ? "Test o'zgarishlarini saqlash" : "Testni e'lon qilish"}
+                    {editingTestId ? "Testni to'liq yangilash" : "Testni e'lon qilish"}
                   </button>
                   {editingTestId && (
                     <button
                       type="button"
-                      onClick={() => { setEditingTestId(null); setTitle(''); setTestQuestions([]); }}
+                      onClick={() => { setEditingTestId(null); setTitle(''); setTestQuestions([]); setEditingQuestionId(null); }}
                       className="px-6 py-3 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold rounded-xl text-sm transition"
                     >
                       Bekor qilish
