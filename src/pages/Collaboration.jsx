@@ -11,8 +11,13 @@ export default function Collaboration() {
   const [className, setClassName] = useState('');
   const [classCodeInput, setClassCodeInput] = useState('');
   const [myClasses, setMyClasses] = useState([]);
-  const [selectedClass, setSelectedClass] = useState(null); // Tanlangan sinf (ichiga kirish uchun)
-  const [announcement, setAnnouncement] = useState('');
+  const [selectedClass, setSelectedClass] = useState(null);
+  
+  // Material qo'shish uchun state-lar
+  const [materialType, setMaterialType] = useState('announcement'); // 'announcement', 'video', 'test'
+  const [title, setTitle] = useState('');
+  const [contentUrl, setContentUrl] = useState('');
+  
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -42,7 +47,6 @@ export default function Collaboration() {
     }
   };
 
-  // Sinf yaratish
   const handleCreateClass = async (e) => {
     e.preventDefault();
     if (!className.trim()) return;
@@ -57,7 +61,7 @@ export default function Collaboration() {
         teacherUsername: user.username,
         teacherFullName: user.fullName,
         students: [],
-        announcements: [],
+        materials: [],
         createdAt: new Date()
       });
 
@@ -72,7 +76,6 @@ export default function Collaboration() {
     }
   };
 
-  // Sinfga qo'shilish
   const handleJoinClass = async (e) => {
     e.preventDefault();
     const code = classCodeInput.trim().toUpperCase();
@@ -105,30 +108,32 @@ export default function Collaboration() {
     }
   };
 
-  // E'lon yoki material qo'shish
-  const handleAddAnnouncement = async (e) => {
+  // Material (E'lon, Videodars, Test) qo'shish
+  const handleAddMaterial = async (e) => {
     e.preventDefault();
-    if (!announcement.trim() || !selectedClass) return;
+    if (!title.trim() || !selectedClass) return;
 
     try {
       const classRef = doc(db, "classes", selectedClass.id);
-      const newAnnouncement = {
+      const newMaterial = {
         id: Date.now(),
-        text: announcement,
+        type: materialType, // 'announcement', 'video', 'test'
+        title: title,
+        url: contentUrl,
         date: new Date().toLocaleDateString()
       };
 
       await updateDoc(classRef, {
-        announcements: arrayUnion(newAnnouncement)
+        materials: arrayUnion(newMaterial)
       });
 
-      // Local state ni yangilash
-      const updatedAnnouncements = [...(selectedClass.announcements || []), newAnnouncement];
-      setSelectedClass({ ...selectedClass, announcements: updatedAnnouncements });
-      setAnnouncement('');
+      const updatedMaterials = [...(selectedClass.materials || []), newMaterial];
+      setSelectedClass({ ...selectedClass, materials: updatedMaterials });
+      setTitle('');
+      setContentUrl('');
     } catch (err) {
       console.error(err);
-      alert("E'lon qo'shishda xatolik.");
+      alert("Material qo'shishda xatolik.");
     }
   };
 
@@ -146,7 +151,6 @@ export default function Collaboration() {
     );
   }
 
-  // Agar biror sinf tanlangan bo'lsa, o'sha sinfning ichki sahifasini ko'rsatish
   if (selectedClass) {
     return (
       <div className="max-w-5xl mx-auto px-6 py-10 font-sans">
@@ -169,41 +173,113 @@ export default function Collaboration() {
           </div>
         </div>
 
-        {/* O'qituvchi uchun e'lon kiritish */}
+        {/* O'qituvchi uchun Material / Test / Videodars qo'shish paneli */}
         {user.role === 'teacher' && (
           <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100 mb-8">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">📌 Sinfga e'lon yoki topshiriq yuborish</h3>
-            <form onSubmit={handleAddAnnouncement} className="space-y-4">
-              <textarea
-                rows="3"
-                required
-                placeholder="Topshiriq yoki e'lon matnini yozing..."
-                value={announcement}
-                onChange={(e) => setAnnouncement(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm text-gray-900"
-              />
+            <h3 className="text-lg font-bold text-gray-900 mb-4">📚 Sinfga material, video yoki test qo'shish</h3>
+            <form onSubmit={handleAddMaterial} className="space-y-4">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-600 mb-2">Material turi</label>
+                  <select
+                    value={materialType}
+                    onChange={(e) => setMaterialType(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm bg-white text-gray-900"
+                  >
+                    <option value="announcement">📢 E'lon / Matnli topshiriq</option>
+                    <option value="video">🎥 Videodars havolasi</option>
+                    <option value="test">📝 Test / Interaktiv topshiriq</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-600 mb-2">Sarlavha yoki Mavzu</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Masalan: 1-mavzu bo'yicha video dars"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm text-gray-900"
+                  />
+                </div>
+              </div>
+
+              {materialType !== 'announcement' && (
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-600 mb-2">Havola (URL link)</label>
+                  <input
+                    type="url"
+                    required
+                    placeholder="https://youtube.com/... yoki test havolasi"
+                    value={contentUrl}
+                    onChange={(e) => setContentUrl(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm text-gray-900"
+                  />
+                </div>
+              )}
+
+              {materialType === 'announcement' && (
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-600 mb-2">E'lon matni</label>
+                  <textarea
+                    rows="3"
+                    required
+                    placeholder="E'lon tafsilotlarini yozing..."
+                    value={contentUrl}
+                    onChange={(e) => setContentUrl(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:border-orange-600 text-sm text-gray-900"
+                  />
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition shadow"
+                className="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl text-sm transition shadow"
               >
-                E'lon qilish
+                Materialni e'lon qilish
               </button>
             </form>
           </div>
         )}
 
-        {/* E'lonlar ro'yxati */}
+        {/* Materiallar va O'quvchilar ro'yxati */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          {/* E'lonlar va O'quv materiallari */}
           <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">📢 E'lonlar va Materiallar</h3>
-            {(!selectedClass.announcements || selectedClass.announcements.length === 0) ? (
-              <p className="text-sm text-gray-500">Hozircha e'lonlar mavjud emas.</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">📂 Dars materiallari va Testlar</h3>
+            {(!selectedClass.materials || selectedClass.materials.length === 0) ? (
+              <p className="text-sm text-gray-500">Hozircha materiallar mavjud emas.</p>
             ) : (
-              <div className="space-y-3">
-                {selectedClass.announcements.map((item) => (
-                  <div key={item.id} className="p-4 bg-orange-50/50 rounded-xl border border-orange-100">
-                    <p className="text-xs text-gray-400 mb-1">{item.date}</p>
-                    <p className="text-sm text-gray-800 font-medium">{item.text}</p>
+              <div className="space-y-4">
+                {selectedClass.materials.map((item) => (
+                  <div key={item.id} className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-lg ${
+                        item.type === 'video' ? 'bg-purple-100 text-purple-800' :
+                        item.type === 'test' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'
+                      }`}>
+                        {item.type === 'video' ? '🎥 Videodars' : item.type === 'test' ? '📝 Test' : '📢 E\'lon'}
+                      </span>
+                      <span className="text-xs text-gray-400">{item.date}</span>
+                    </div>
+
+                    <h4 className="font-bold text-gray-900 text-base">{item.title}</h4>
+
+                    {item.type === 'announcement' ? (
+                      <p className="text-sm text-gray-600">{item.url}</p>
+                    ) : (
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition"
+                      >
+                        {item.type === 'video' ? '▶ Videoni ko\'rish' : '🔗 Testni boshlash'}
+                      </a>
+                    )}
                   </div>
                 ))}
               </div>
@@ -226,6 +302,7 @@ export default function Collaboration() {
               </ul>
             )}
           </div>
+
         </div>
       </div>
     );
@@ -285,7 +362,7 @@ export default function Collaboration() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">📂 Mening sinflarim (Ichiga kirish uchun bosing)</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">📂 Mening sinflarim</h3>
             {myClasses.length === 0 ? (
               <p className="text-sm text-gray-500">Hozircha sinflar yaratmagansiz.</p>
             ) : (
